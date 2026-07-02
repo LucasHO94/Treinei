@@ -1,114 +1,107 @@
 -- Treinei — seed do catálogo nativo (grupos musculares + exercícios)
 -- Nomes de exercícios são termos genéricos de treino, sem vínculo com nenhum app de terceiros.
+-- IDs de exercícios são fixos (não gen_random_uuid()) para baterem com o seed local
+-- embutido no app (src/lib/db/local-seed.ts), que roda offline sem backend.
 
-insert into muscle_groups (slug, name, sort_order) values
-  ('peito',        'Peitorais',     1),
-  ('costas',       'Costas',        2),
-  ('ombros',       'Ombros',        3),
-  ('biceps',       'Bíceps',        4),
-  ('triceps',      'Tríceps',       5),
-  ('antebraco',    'Antebraço',     6),
-  ('trapezio',     'Trapézio',      7),
-  ('abdomen',      'Abdômen',       8),
-  ('coxa_quadril', 'Coxa / Quadril',9),
-  ('gluteos',      'Glúteos',       10),
-  ('panturrilha',  'Panturrilha',   11),
-  ('peso_corpo',   'Peso do Corpo', 12);
+insert into muscle_groups (id, slug, name, sort_order) values
+  (1, 'peito', 'Peitorais', 1),
+  (2, 'costas', 'Costas', 2),
+  (3, 'ombros', 'Ombros', 3),
+  (4, 'biceps', 'Bíceps', 4),
+  (5, 'triceps', 'Tríceps', 5),
+  (6, 'antebraco', 'Antebraço', 6),
+  (7, 'trapezio', 'Trapézio', 7),
+  (8, 'abdomen', 'Abdômen', 8),
+  (9, 'coxa_quadril', 'Coxa / Quadril', 9),
+  (10, 'gluteos', 'Glúteos', 10),
+  (11, 'panturrilha', 'Panturrilha', 11),
+  (12, 'peso_corpo', 'Peso do Corpo', 12);
+
+select setval(pg_get_serial_sequence('muscle_groups', 'id'), (select max(id) from muscle_groups));
 
 -- Peito
-insert into exercises (muscle_group_id, name) select id, x from muscle_groups, unnest(array[
-  'Supino Reto no Aparelho',
-  'Supino Inclinado no Aparelho',
-  'Supino Reto c/ Halteres',
-  'Supino Inclinado c/ Halteres',
-  'Crucifixo no Voador',
-  'Pullover - v. Peito'
-]) as x where slug = 'peito';
+insert into exercises (id, muscle_group_id, name) values
+  ('d1dad43c-d670-4003-b53d-47535b4a7694', 1, 'Supino Reto no Aparelho'),
+  ('7611981b-dcd1-4f21-b730-c30996d7a85b', 1, 'Supino Inclinado no Aparelho'),
+  ('057010ff-3556-41e1-9130-c035fcf0ae7d', 1, 'Supino Reto c/ Halteres'),
+  ('f11fd4b3-a0f3-4964-986f-972555bbcb51', 1, 'Supino Inclinado c/ Halteres'),
+  ('c84bfc1d-e59f-443d-8f20-bb96cd666e89', 1, 'Crucifixo no Voador'),
+  ('d2e9acd7-b5f0-4222-872a-83432934053c', 1, 'Pullover - v. Peito');
 
 -- Costas
-insert into exercises (muscle_group_id, name) select id, x from muscle_groups, unnest(array[
-  'Puxada pela Frente - Pegada Aberta',
-  'Puxada pela Frente - Pegada Invertida',
-  'Remada no Aparelho',
-  'Remada Vertical no Aparelho',
-  'Remada Sentado - Pegada Invertida',
-  'Remada Unilateral c/ Halter (Serrote)',
-  'Crucifixo Inverso no Voador'
-]) as x where slug = 'costas';
+insert into exercises (id, muscle_group_id, name) values
+  ('76d76bbc-c833-4540-b343-e5379e0c3758', 2, 'Puxada pela Frente - Pegada Aberta'),
+  ('54086923-ab67-4529-ad6c-20b96bce0478', 2, 'Puxada pela Frente - Pegada Invertida'),
+  ('3d92644a-956c-45e7-ad72-3631edd679b9', 2, 'Remada no Aparelho'),
+  ('9e01c250-d973-43d7-9c49-54a4367376f7', 2, 'Remada Vertical no Aparelho'),
+  ('c7426e19-2b4d-4465-9365-83885141473f', 2, 'Remada Sentado - Pegada Invertida'),
+  ('ba682c1f-0806-47ce-9065-d7abf4c867e5', 2, 'Remada Unilateral c/ Halter (Serrote)'),
+  ('9c435821-71f7-47f0-8ce6-810ee7ec16c1', 2, 'Crucifixo Inverso no Voador');
 
 -- Ombros
-insert into exercises (muscle_group_id, name) select id, x from muscle_groups, unnest(array[
-  'Desenvolvimento no Aparelho',
-  'Desenvolvimento c/ Halteres',
-  'Elevação Lateral',
-  'Elevação Frontal c/ Halteres',
-  'Elevação Frontal c/ Anilha',
-  'Remada Alta c/ Cabo'
-]) as x where slug = 'ombros';
+insert into exercises (id, muscle_group_id, name) values
+  ('ceedf772-7294-4c4e-b632-94e34821d876', 3, 'Desenvolvimento no Aparelho'),
+  ('8677c76a-4296-4291-8b20-948a4b695daf', 3, 'Desenvolvimento c/ Halteres'),
+  ('80924ee3-190d-49de-a2f9-9e1f865830f2', 3, 'Elevação Lateral'),
+  ('43cb978e-3ef1-445c-9c4b-abe09a9e4f0b', 3, 'Elevação Frontal c/ Halteres'),
+  ('66bdc3f7-9980-4aca-82f5-3c5782f385fc', 3, 'Elevação Frontal c/ Anilha'),
+  ('3021382c-aba5-4077-a330-fb5a7e5d6d34', 3, 'Remada Alta c/ Cabo');
 
 -- Bíceps
-insert into exercises (muscle_group_id, name) select id, x from muscle_groups, unnest(array[
-  'Rosca Direta no Cabo',
-  'Rosca Direta c/ Cabo - Pegada Invertida',
-  'Rosca Inclinada',
-  'Rosca Concentrada',
-  'Rosca c/ Halteres',
-  'Rosca Hammer c/ Cabo - Corda',
-  'Scott Martelo c/ Halteres'
-]) as x where slug = 'biceps';
+insert into exercises (id, muscle_group_id, name) values
+  ('63eafcb3-cbe5-4300-a146-8a86eaac3f0f', 4, 'Rosca Direta no Cabo'),
+  ('eca86675-6f5a-48c7-97bf-bc4dd50aae2a', 4, 'Rosca Direta c/ Cabo - Pegada Invertida'),
+  ('b9009564-14a6-497b-88ff-1c0b23123ebb', 4, 'Rosca Inclinada'),
+  ('5002eada-bcb3-485c-abf1-cc07ced73110', 4, 'Rosca Concentrada'),
+  ('c304f28b-7740-4c50-96b4-9630354a9a36', 4, 'Rosca c/ Halteres'),
+  ('da72bbc1-0959-49ea-8540-4ff75c4ca63d', 4, 'Rosca Hammer c/ Cabo - Corda'),
+  ('e2d45927-2967-452a-85f6-3a01fa29c246', 4, 'Scott Martelo c/ Halteres');
 
 -- Tríceps
-insert into exercises (muscle_group_id, name) select id, x from muscle_groups, unnest(array[
-  'Tríceps Francês',
-  'Tríceps Francês Unilateral',
-  'Extensão de Cotovelos no Cabo - Pegada Invertida',
-  'Extensão de Cotovelos na Roldana Alta',
-  'Extensão de Cotovelos c/ Halteres',
-  'Mergulho no Aparelho - v. Tríceps'
-]) as x where slug = 'triceps';
+insert into exercises (id, muscle_group_id, name) values
+  ('4a559cc0-780e-4799-82a5-14d7db30d903', 5, 'Tríceps Francês'),
+  ('42ad7e3c-9db0-4222-8f89-09f0ea2462bf', 5, 'Tríceps Francês Unilateral'),
+  ('dc5314de-1c31-4c44-b393-25f88dce8c11', 5, 'Extensão de Cotovelos no Cabo - Pegada Invertida'),
+  ('22f2b27d-c8e3-4a3f-848a-cf5f87dfc5b7', 5, 'Extensão de Cotovelos na Roldana Alta'),
+  ('6e901510-4463-490e-9261-bdc4ff9161fe', 5, 'Extensão de Cotovelos c/ Halteres'),
+  ('b31c55e3-d709-411d-b7a5-de9dc6ed8d7f', 5, 'Mergulho no Aparelho - v. Tríceps');
 
 -- Antebraço
-insert into exercises (muscle_group_id, name) select id, x from muscle_groups, unnest(array[
-  'Rosca de Punho',
-  'Rosca de Punho Invertida'
-]) as x where slug = 'antebraco';
+insert into exercises (id, muscle_group_id, name) values
+  ('030d9711-6763-4290-83eb-6d64582febb5', 6, 'Rosca de Punho'),
+  ('ddc1857d-6d3f-4308-9df0-8222a0325c06', 6, 'Rosca de Punho Invertida');
 
 -- Trapézio
-insert into exercises (muscle_group_id, name) select id, x from muscle_groups, unnest(array[
-  'Encolhimento de Ombros c/ Halteres'
-]) as x where slug = 'trapezio';
+insert into exercises (id, muscle_group_id, name) values
+  ('e796fd94-4c19-4540-be88-56134b5070fe', 7, 'Encolhimento de Ombros c/ Halteres');
 
 -- Abdômen
-insert into exercises (muscle_group_id, name) select id, x from muscle_groups, unnest(array[
-  'Infra no Solo',
-  'Jack Knifes'
-]) as x where slug = 'abdomen';
+insert into exercises (id, muscle_group_id, name) values
+  ('98bddc82-a9da-4b5d-804f-173676818c7e', 8, 'Infra no Solo'),
+  ('9915eaa1-a3cd-4256-b819-c1abd2679082', 8, 'Jack Knifes');
 
 -- Coxa / Quadril
-insert into exercises (muscle_group_id, name) select id, x from muscle_groups, unnest(array[
-  'Legpress',
-  'Legpress Horizontal',
-  'Agachamento no Hack',
-  'Extensão de Joelhos',
-  'Flexão de Joelhos - Deitado',
-  'Flexão de Joelhos no Aparelho - Sentado',
-  'Adução de Coxa Sentado',
-  'Abdução de Coxa Sentado'
-]) as x where slug = 'coxa_quadril';
+insert into exercises (id, muscle_group_id, name) values
+  ('55a2e7aa-33b1-44fb-9683-5d73058c2cbd', 9, 'Legpress'),
+  ('1c31d143-eda9-4856-b86c-103a758521b6', 9, 'Legpress Horizontal'),
+  ('e4213805-9a24-4406-965e-eecbeb668cd2', 9, 'Agachamento no Hack'),
+  ('bd9fef1e-ab98-46f3-b0e2-94ea9843ef86', 9, 'Extensão de Joelhos'),
+  ('4d4636e6-bb00-450c-9970-ff1d3fbe37cc', 9, 'Flexão de Joelhos - Deitado'),
+  ('6e04b2e4-9299-455d-9086-a15465da46d5', 9, 'Flexão de Joelhos no Aparelho - Sentado'),
+  ('3e7da9de-fbdf-493a-bc0f-441975c0e70c', 9, 'Adução de Coxa Sentado'),
+  ('cf7c0bf4-2225-4eae-aae5-cf7617b96d97', 9, 'Abdução de Coxa Sentado');
 
 -- Glúteos
-insert into exercises (muscle_group_id, name) select id, x from muscle_groups, unnest(array[
-  'Elevação de Quadril'
-]) as x where slug = 'gluteos';
+insert into exercises (id, muscle_group_id, name) values
+  ('e28336be-d022-4e00-bfcd-6ed261a5a651', 10, 'Elevação de Quadril');
 
 -- Panturrilha
-insert into exercises (muscle_group_id, name) select id, x from muscle_groups, unnest(array[
-  'Panturrilha no Leg Press',
-  'Panturrilha em Pé no Aparelho'
-]) as x where slug = 'panturrilha';
+insert into exercises (id, muscle_group_id, name) values
+  ('ad03f4d4-c40b-434f-a0b2-ef6e998afc77', 11, 'Panturrilha no Leg Press'),
+  ('d516a5fb-7dec-453b-a920-3339ddf6c5b6', 11, 'Panturrilha em Pé no Aparelho');
 
 -- Peso do Corpo
-insert into exercises (muscle_group_id, name) select id, x from muscle_groups, unnest(array[
-  'Agachamento Livre sem Peso',
-  'Ondas de Pulso - Para Baixo'
-]) as x where slug = 'peso_corpo';
+insert into exercises (id, muscle_group_id, name) values
+  ('0fd6d098-7662-4d3d-9c2e-f7e1ca9b3f67', 12, 'Agachamento Livre sem Peso'),
+  ('7c737de4-9f9e-4b4a-a524-7c670031a3c4', 12, 'Ondas de Pulso - Para Baixo');
+

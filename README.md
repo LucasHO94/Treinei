@@ -6,7 +6,7 @@ Implementação seguindo [`PLANEJAMENTO.md`](../PLANEJAMENTO.md) (arquitetura co
 
 - ✅ **Fase 0** — Bootstrap: Vite + React + TS, Tailwind v4, vite-plugin-pwa (injectManifest), design tokens, ícones placeholder.
 - ✅ **Fase 1** — Fundação: migrations SQL + RLS + seed do catálogo, Dexie (offline-first com outbox), cliente Supabase + Auth scaffold, shell de navegação (Hoje/Treino/Dieta/Perfil).
-- ⬜ **Fase 2** — Módulo Treino (catálogo, builder, execução com timer, histórico).
+- ✅ **Fase 2** — Módulo Treino: catálogo (acordeão + busca + criar exercício custom), builder de rotina (divisões, exercícios, séries planejadas), execução (inputs reais, timer de descanso em Web Worker + Wake Lock + notificação local, resumo ao concluir), histórico de sessões com placeholder de última carga.
 - ⬜ **Fase 3** — Módulo Dieta (refeições, alimentos, check-in, metas).
 - ⬜ **Fase 4** — Push remoto (Edge Functions + pg_cron), polimento iOS/Android.
 
@@ -31,6 +31,11 @@ npm run dev
    ```bash
    supabase gen types typescript --project-id <seu-project-id> > src/types/supabase.ts
    ```
+
+## Notas de arquitetura (Fase 2)
+
+- **Catálogo embutido no app** (`src/lib/db/local-seed.ts`) — os mesmos ~50 exercícios e 12 grupos musculares das migrations SQL são semeados localmente no Dexie no primeiro load (`ensureLocalSeed`), com os **mesmos IDs fixos** usados no seed do Supabase. Assim o catálogo funciona 100% offline sem backend configurado, e quando você conectar um projeto Supabase real os IDs batem (sem duplicar exercícios nem quebrar referências de `workout_exercises`).
+- **Usuário local** (`src/lib/auth/current-user.ts`) — como ainda não há tela de login, rotinas/sessões são gravadas sob um UUID persistido em `localStorage`. Uma sessão Supabase real (quando existir) tem prioridade automaticamente.
 
 ## Pendências que dependem de você (fora do escopo de código)
 
