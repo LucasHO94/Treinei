@@ -7,6 +7,7 @@ import { RoutineBuilderPage } from '@/features/workout/builder/routine-builder-p
 import { ExecutionPage } from '@/features/workout/execution/execution-page'
 import { HistoryPage } from '@/features/workout/history/history-page'
 import { DietPage } from '@/features/diet/diet-page'
+import { MealDetailPage } from '@/features/diet/meals/meal-detail-page'
 import { ProfilePage } from '@/features/profile/profile-page'
 
 export function AppRouter() {
@@ -19,7 +20,8 @@ export function AppRouter() {
         <Route path="treino/historico" element={<HistoryPage />} />
         <Route path="treino/rotina/:routineId" element={<RoutineBuilderPage />} />
         <Route path="treino/executar/:workoutId" element={<ExecutionPage />} />
-        <Route path="dieta/*" element={<DietPage />} />
+        <Route path="dieta" element={<DietPage />} />
+        <Route path="dieta/refeicao/:mealId" element={<MealDetailPage />} />
         <Route path="perfil" element={<ProfilePage />} />
       </Route>
     </Routes>
