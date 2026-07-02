@@ -8,7 +8,7 @@ Implementação seguindo [`PLANEJAMENTO.md`](../PLANEJAMENTO.md) (arquitetura co
 - ✅ **Fase 1** — Fundação: migrations SQL + RLS + seed do catálogo, Dexie (offline-first com outbox), cliente Supabase + Auth scaffold, shell de navegação (Hoje/Treino/Dieta/Perfil).
 - ✅ **Fase 2** — Módulo Treino: catálogo (acordeão + busca + criar exercício custom), builder de rotina (divisões, exercícios, séries planejadas), execução (inputs reais, timer de descanso em Web Worker + Wake Lock + notificação local, resumo ao concluir), histórico de sessões com placeholder de última carga.
 - ✅ **Fase 3** — Módulo Dieta: CRUD de refeições (timeline cronológica), busca/criação de alimentos com cálculo de macros ao vivo, check-in diário com snapshot, metas de macros no Perfil, dashboard Hoje integrando treino do dia + próxima refeição + progresso de macros.
-- ⬜ **Fase 4** — Push remoto (Edge Functions + pg_cron), polimento iOS/Android.
+- 🟡 **Fase 4** (parcial) — Push remoto: VAPID gerado, `notification_schedules` sincronizado com refeições (`notify`/horário) e lembrete diário de treino configurável no Perfil, fluxo de permissão (`subscribeToPush`/`unsubscribeFromPush`) e onboarding de instalação iOS. Faltam as Edge Functions `send-push`/`notifications-cron` + `pg_cron` (dependem de um projeto Supabase real) e o teste em dispositivo iOS/Android.
 
 ## Como rodar
 
@@ -45,10 +45,17 @@ npm run dev
 - **`nutrition_goals`** tem `user_id` como chave primária (sem campo `id`), então não se encaixa na assinatura genérica de `mutate()` — grava direto no Dexie + outbox em `setNutritionGoals()` (ver `src/features/diet/lib/actions.ts`). Só faz insert/update, nunca delete (o `drainOutbox` assume uma coluna `id` no delete, que essa tabela não tem — se um dia for necessário deletar metas, ajustar o sync engine primeiro).
 - **Dashboard Hoje**: sugere a divisão de treino do dia comparando `workout.weekday` com o dia da semana atual, com fallback para a primeira divisão da primeira rotina (ainda não há UI para configurar o weekday de cada divisão — fica para quando a Fase 4 adicionar lembretes de treino por dia).
 
+## Notas de arquitetura (Fase 4 — parcial)
+
+- **`notification_schedules` espelha o domínio, não o contrário** — `createMeal`/`updateMeal`/`deleteMeal` (`src/features/diet/lib/actions.ts`) chamam `upsertMealSchedule`/`deleteMealSchedule` (`src/features/notifications/lib/actions.ts`) sempre que `notify`/`scheduled_at` mudam. Assim o backend (quando existir) só precisa ler `notification_schedules` — não precisa conhecer a tabela `meals`. O checkbox "Notificar" já existente em `meal-detail-page.tsx` (Fase 3) agora aciona essa sincronização.
+- **Lembrete de treino é um registro único por usuário** (`kind='workout_reminder'`, `ref_id=null`) — horário + dias da semana configuráveis no Perfil (`WorkoutReminderCard`). O conteúdo da notificação ("Hoje é dia de Treino B") é resolvido pelo backend cruzando o dia atual com `workouts.weekday`, não fica armazenado aqui.
+- **`PushPermissionCard`** (`src/features/notifications/push-permission-card.tsx`) só habilita o botão "Ativar notificações" quando `isSupabaseConfigured` é verdadeiro — sem backend real não há onde persistir a subscription, então a UI comunica isso em vez de tentar e falhar silenciosamente.
+- **Onboarding de instalação iOS** (`src/features/notifications/onboarding/ios-install-card.tsx`) detecta iOS Safari fora do modo standalone via user-agent + `matchMedia('(display-mode: standalone)')` e mostra o tutorial "Compartilhar → Adicionar à Tela de Início" — só aparece quando realmente necessário (RF17/18).
+
 ## Pendências que dependem de você (fora do escopo de código)
 
-- **Conta/projeto Supabase real** — não é possível criar programaticamente; siga o passo acima.
-- **Chaves VAPID para Web Push** (Fase 4) — gerar com `npx web-push generate-vapid-keys`; a pública vai em `VITE_VAPID_PUBLIC_KEY`, a privada é um secret da Edge Function.
+- **Conta/projeto Supabase real** — não é possível criar programaticamente; siga o passo acima. Bloqueia as Edge Functions `send-push`/`notifications-cron` e o `pg_cron` da Fase 4 (o app já grava tudo localmente em `notification_schedules`, só falta o backend enviar).
+- **Chave privada VAPID** — já gerada nesta sessão, guarde-a com você (não fica salva no repo); ela vira secret da Edge Function `send-push` quando o projeto Supabase existir. A pública já está em `.env.local`.
 - **Ícones finais e GIFs de exercícios** — os ícones em `public/icons/` são placeholders gerados por `scripts/generate-icons.mjs`. Os GIFs/ilustrações de execução de exercício (`exercises.media_url`) precisam vir de um banco licenciado (ex.: ExerciseDB) ou de produção própria — **nunca reaproveitar assets do app de referência**, por questão de direitos autorais.
 - **Base completa de alimentos (TACO)** — `supabase/seed/0002_foods.sql` tem ~30 itens comuns; a tabela TACO completa (~500 itens) fica para a Fase 3.
 - **Teste real em dispositivo iOS (≥16.4)** — instalação na Tela de Início e push só podem ser validados em hardware real, não em simulador de navegador.

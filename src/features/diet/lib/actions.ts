@@ -1,6 +1,7 @@
 import { db } from '@/lib/db'
 import { mutate } from '@/lib/db/mutate'
 import { requestSync } from '@/lib/sync/engine'
+import { upsertMealSchedule, deleteMealSchedule } from '@/features/notifications/lib/actions'
 import type { Meal, MealItem, MealLog, Food, NutritionGoals } from '@/types/domain'
 import { mealItemsMacros } from './macros'
 
@@ -25,6 +26,9 @@ export async function createMeal(userId: string, name: string, scheduledAt: stri
     notify: true,
   }
   await mutate('meals', 'insert', meal)
+  // notification_schedules espelha meal.notify/scheduled_at (RF15) — o cron do backend
+  // lê essa tabela diretamente, sem precisar conhecer o domínio de refeições.
+  await upsertMealSchedule(userId, meal.id, { send_time: meal.scheduled_at, enabled: meal.notify })
   return meal
 }
 
@@ -32,7 +36,14 @@ export async function updateMeal(
   meal: Meal,
   patch: Partial<Pick<Meal, 'name' | 'scheduled_at' | 'notify'>>,
 ): Promise<void> {
-  await mutate('meals', 'update', { ...meal, ...patch })
+  const updated = { ...meal, ...patch }
+  await mutate('meals', 'update', updated)
+  if (patch.scheduled_at !== undefined || patch.notify !== undefined) {
+    await upsertMealSchedule(updated.user_id, updated.id, {
+      send_time: updated.scheduled_at,
+      enabled: updated.notify,
+    })
+  }
 }
 
 export async function deleteMeal(mealId: string): Promise<void> {
@@ -46,6 +57,7 @@ export async function deleteMeal(mealId: string): Promise<void> {
   for (const log of logs) {
     await mutate('meal_logs', 'delete', log)
   }
+  await deleteMealSchedule(meal.user_id, meal.id)
   await mutate('meals', 'delete', meal)
 }
 

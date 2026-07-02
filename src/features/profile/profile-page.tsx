@@ -5,6 +5,9 @@ import { Input } from '@/components/ui/input'
 import { useCurrentUserId } from '@/lib/auth/current-user'
 import { useNutritionGoals } from '@/features/diet/lib/queries'
 import { setNutritionGoals } from '@/features/diet/lib/actions'
+import { PushPermissionCard } from '@/features/notifications/push-permission-card'
+import { WorkoutReminderCard } from '@/features/notifications/workout-reminder-card'
+import { IosInstallCard } from '@/features/notifications/onboarding/ios-install-card'
 
 const EMPTY_FORM = { protein: '', carbs: '', fat: '', kcal: '' }
 
@@ -103,8 +106,17 @@ export function ProfilePage() {
         <CardHeader>
           <CardTitle>Notificações</CardTitle>
         </CardHeader>
-        <CardContent className="text-sm text-muted">Ative lembretes de refeição e de treino.</CardContent>
+        <CardContent className="flex flex-col gap-4">
+          <PushPermissionCard userId={userId} />
+          <div className="h-px bg-border" />
+          <WorkoutReminderCard userId={userId} />
+          <p className="text-xs text-muted">
+            Lembretes de refeição seguem o horário e o interruptor "Notificar" de cada refeição, em Dieta.
+          </p>
+        </CardContent>
       </Card>
+
+      <IosInstallCard />
     </div>
   )
 }
