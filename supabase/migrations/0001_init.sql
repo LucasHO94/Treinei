@@ -1,0 +1,159 @@
+-- Treinei — migration inicial (schema completo)
+-- Referência: PLANEJAMENTO.md, seção 2 (Arquitetura de Dados)
+
+-- ============ CATÁLOGO (dados globais, read-only p/ usuários) ============
+create table muscle_groups (
+  id          smallint primary key generated always as identity,
+  slug        text unique not null,          -- 'peito', 'costas'...
+  name        text not null,                 -- 'Peitorais'
+  sort_order  smallint not null default 0,
+  image_url   text
+);
+
+create table exercises (
+  id              uuid primary key default gen_random_uuid(),
+  muscle_group_id smallint not null references muscle_groups(id),
+  name            text not null,
+  media_url       text,                      -- GIF/ilustração de execução
+  is_custom       boolean not null default false,
+  owner_id        uuid references auth.users(id) on delete cascade,  -- null = nativo do catálogo
+  created_at      timestamptz not null default now(),
+  constraint custom_needs_owner check (is_custom = false or owner_id is not null)
+);
+create index on exercises (muscle_group_id);
+create index exercises_name_search_idx on exercises using gin (to_tsvector('portuguese', name));
+
+-- ============ ROTINAS E TREINOS ============
+create table routines (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  name       text not null default 'Minha Rotina',
+  is_active  boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table workouts (                       -- divisão: "Treino A"
+  id          uuid primary key default gen_random_uuid(),
+  routine_id  uuid not null references routines(id) on delete cascade,
+  name        text not null,                  -- 'Treino A' / 'Peito + Tríceps'
+  label       text,                           -- 'A', 'B'... (chip curto)
+  sort_order  smallint not null default 0,
+  weekday     smallint,                       -- 0-6, opcional: dia sugerido (lembrete RF16)
+  created_at  timestamptz not null default now()
+);
+
+create table workout_exercises (
+  id           uuid primary key default gen_random_uuid(),
+  workout_id   uuid not null references workouts(id) on delete cascade,
+  exercise_id  uuid not null references exercises(id),
+  sort_order   smallint not null default 0,
+  rest_seconds smallint not null default 60,
+  notes        text
+);
+create index on workout_exercises (workout_id, sort_order);
+
+create table planned_sets (                   -- série PLANEJADA (meta)
+  id                  uuid primary key default gen_random_uuid(),
+  workout_exercise_id uuid not null references workout_exercises(id) on delete cascade,
+  set_number          smallint not null,
+  target_reps         smallint,
+  target_weight_kg    numeric(6,2),
+  intensity           text not null default 'heavy'
+                      check (intensity in ('light','heavy','failure')),
+  unique (workout_exercise_id, set_number)
+);
+
+-- ============ EXECUÇÃO (histórico) ============
+create table workout_sessions (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid not null references auth.users(id) on delete cascade,
+  workout_id   uuid references workouts(id) on delete set null,
+  started_at   timestamptz not null default now(),
+  finished_at  timestamptz,
+  notes        text
+);
+create index on workout_sessions (user_id, started_at desc);
+
+create table session_sets (                   -- série REALIZADA (valores reais)
+  id                  uuid primary key default gen_random_uuid(),
+  session_id          uuid not null references workout_sessions(id) on delete cascade,
+  workout_exercise_id uuid references workout_exercises(id) on delete set null,
+  exercise_name       text not null,          -- desnormalizado: histórico sobrevive a edições
+  set_number          smallint not null,
+  reps                smallint,
+  weight_kg           numeric(6,2),
+  intensity           text check (intensity in ('light','heavy','failure')),
+  completed_at        timestamptz not null default now()
+);
+create index on session_sets (session_id);
+
+-- ============ DIETA ============
+create table foods (
+  id            uuid primary key default gen_random_uuid(),
+  name          text not null,
+  portion_desc  text not null default '100g', -- '100g', '1 unidade', '1 colher'
+  portion_grams numeric(7,2),
+  protein_g     numeric(6,2) not null default 0,
+  carbs_g       numeric(6,2) not null default 0,
+  fat_g         numeric(6,2) not null default 0,
+  kcal          numeric(7,2) not null default 0,
+  is_custom     boolean not null default false,
+  owner_id      uuid references auth.users(id) on delete cascade
+);
+create index foods_name_search_idx on foods using gin (to_tsvector('portuguese', name));
+
+create table meals (                          -- refeição PROGRAMADA
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid not null references auth.users(id) on delete cascade,
+  name         text not null,                 -- 'Café da Manhã'
+  scheduled_at time not null,                 -- 07:30
+  sort_order   smallint not null default 0,
+  notify       boolean not null default true
+);
+
+create table meal_items (
+  id        uuid primary key default gen_random_uuid(),
+  meal_id   uuid not null references meals(id) on delete cascade,
+  food_id   uuid not null references foods(id),
+  quantity  numeric(7,2) not null default 1   -- multiplicador da porção
+);
+
+create table meal_logs (                      -- check-in "comi"
+  id        uuid primary key default gen_random_uuid(),
+  user_id   uuid not null references auth.users(id) on delete cascade,
+  meal_id   uuid references meals(id) on delete set null,
+  log_date  date not null default current_date,
+  eaten_at  timestamptz not null default now(),
+  -- snapshot dos macros no momento do check-in (sobrevive a edições da refeição):
+  protein_g numeric(6,2), carbs_g numeric(6,2), fat_g numeric(6,2), kcal numeric(7,2),
+  unique (meal_id, log_date)
+);
+
+create table nutrition_goals (
+  user_id   uuid primary key references auth.users(id) on delete cascade,
+  protein_g numeric(6,2), carbs_g numeric(6,2), fat_g numeric(6,2), kcal numeric(7,2)
+);
+
+-- ============ NOTIFICAÇÕES ============
+create table push_subscriptions (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  endpoint   text unique not null,
+  p256dh     text not null,
+  auth       text not null,
+  user_agent text,
+  created_at timestamptz not null default now()
+);
+
+create table notification_schedules (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  kind       text not null check (kind in ('meal','workout_reminder')),
+  ref_id     uuid,                            -- meal_id quando kind='meal'
+  send_time  time not null,                   -- horário local do usuário
+  timezone   text not null default 'America/Sao_Paulo',
+  weekdays   smallint[] not null default '{0,1,2,3,4,5,6}',
+  enabled    boolean not null default true,
+  last_sent_on date                           -- idempotência do cron
+);
+create index on notification_schedules (enabled, send_time);

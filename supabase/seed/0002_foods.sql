@@ -1,0 +1,35 @@
+-- Treinei — seed inicial de alimentos (subconjunto comum, por 100g)
+-- Valores aproximados de referência nutricional pública (TACO/TBCA).
+-- TODO (Fase 3): importar tabela TACO completa (~500 itens) via CSV — ver README.md.
+
+insert into foods (name, portion_desc, portion_grams, protein_g, carbs_g, fat_g, kcal) values
+  ('Arroz branco cozido',        '100g', 100, 2.5,  28.1, 0.2,  128),
+  ('Arroz integral cozido',      '100g', 100, 2.6,  25.8, 1.0,  124),
+  ('Feijão carioca cozido',      '100g', 100, 4.8,  13.6, 0.5,  76),
+  ('Feijão preto cozido',        '100g', 100, 4.5,  14.0, 0.5,  77),
+  ('Peito de frango grelhado',   '100g', 100, 32.0, 0.0,  3.6,  159),
+  ('Coxa de frango assada',      '100g', 100, 26.0, 0.0,  10.0, 197),
+  ('Carne bovina moída (patinho)','100g',100, 26.0, 0.0,  8.0,  180),
+  ('Ovo cozido',                 '1 unidade', 50, 6.3,  0.6,  5.0,  70),
+  ('Ovo (clara)',                '1 unidade', 33, 3.6,  0.2,  0.0,  17),
+  ('Batata doce cozida',         '100g', 100, 1.6,  20.1, 0.1,  86),
+  ('Batata inglesa cozida',      '100g', 100, 1.9,  18.2, 0.1,  82),
+  ('Aveia em flocos',            '100g', 100, 13.9, 66.6, 8.5,  394),
+  ('Pão francês',                '1 unidade', 50, 4.0,  28.0, 1.5,  135),
+  ('Pão integral',               '1 fatia', 25, 2.5,  12.0, 1.0,  70),
+  ('Whey protein (concentrado)', '1 scoop', 30, 24.0, 3.0,  1.5,  120),
+  ('Banana prata',               '1 unidade', 70, 0.9,  20.0, 0.1,  85),
+  ('Maçã',                       '1 unidade', 130, 0.3,  19.0, 0.2,  78),
+  ('Brócolis cozido',            '100g', 100, 2.8,  4.0,  0.4,  28),
+  ('Tomate',                     '100g', 100, 0.9,  3.9,  0.2,  18),
+  ('Alface',                     '100g', 100, 1.4,  1.7,  0.2,  11),
+  ('Azeite de oliva extra virgem','1 colher (sopa)', 13, 0.0, 0.0, 13.5, 119),
+  ('Castanha do Pará',           '1 unidade', 5,  0.7,  0.6,  3.4,  33),
+  ('Amendoim torrado',           '30g', 30,  7.6,  6.0,  14.0, 175),
+  ('Iogurte natural integral',   '100g', 100, 3.5,  4.7,  3.0,  61),
+  ('Leite desnatado',            '200ml', 200, 6.8,  9.8,  0.4,  70),
+  ('Queijo minas frescal',       '30g', 30,  5.4,  0.9,  4.3,  71),
+  ('Tapioca (goma hidratada)',   '100g', 100, 0.0,  25.0, 0.0,  100),
+  ('Salmão grelhado',            '100g', 100, 22.0, 0.0,  13.0, 208),
+  ('Atum em água (lata)',        '100g', 100, 26.0, 0.0,  1.0,  116),
+  ('Abacate',                    '100g', 100, 2.0,  8.5,  14.7, 160);

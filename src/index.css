@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  Design tokens — Treinei
+  Dark-first, verde-lima como cor primária (energia/fitness), âmbar como acento do módulo Dieta.
+  Deliberadamente distinto do app de referência (tema claro + vermelho).
+*/
+@theme {
+  --font-display: "Manrope", "Inter", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  --color-background: #0e1116;
+  --color-surface: #151a21;
+  --color-card: #1a1f27;
+  --color-border: #262c36;
+
+  --color-foreground: #f4f6f8;
+  --color-muted: #8b95a3;
+  --color-muted-foreground: #626b78;
+
+  --color-primary: #a3e635;
+  --color-primary-foreground: #0e1116;
+
+  --color-accent: #f59e0b;
+  --color-accent-foreground: #0e1116;
+
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #f4f6f8;
+
+  --color-intensity-light: #4ade80;
+  --color-intensity-heavy: #fbbf24;
+  --color-intensity-failure: #f87171;
+
+  --radius-lg: 1rem;
+  --radius-md: 0.75rem;
+  --radius-sm: 0.5rem;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+  }
+
+  /* Números tabulares para cargas/reps — evita "dança" de dígitos ao digitar */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
