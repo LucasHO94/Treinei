@@ -1,14 +1,32 @@
+import { lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import { AppLayout } from './layout'
 import { TodayPage } from '@/features/today/today-page'
-import { WorkoutPage } from '@/features/workout/workout-page'
-import { CatalogPage } from '@/features/workout/catalog/catalog-page'
-import { RoutineBuilderPage } from '@/features/workout/builder/routine-builder-page'
-import { ExecutionPage } from '@/features/workout/execution/execution-page'
-import { HistoryPage } from '@/features/workout/history/history-page'
-import { DietPage } from '@/features/diet/diet-page'
-import { MealDetailPage } from '@/features/diet/meals/meal-detail-page'
-import { ProfilePage } from '@/features/profile/profile-page'
+
+// Code-splitting por rota: só a aba "Hoje" (index) entra no bundle inicial —
+// as demais carregam sob demanda, reduzindo o JS avaliado no primeiro paint.
+const WorkoutPage = lazy(() =>
+  import('@/features/workout/workout-page').then((m) => ({ default: m.WorkoutPage })),
+)
+const CatalogPage = lazy(() =>
+  import('@/features/workout/catalog/catalog-page').then((m) => ({ default: m.CatalogPage })),
+)
+const RoutineBuilderPage = lazy(() =>
+  import('@/features/workout/builder/routine-builder-page').then((m) => ({ default: m.RoutineBuilderPage })),
+)
+const ExecutionPage = lazy(() =>
+  import('@/features/workout/execution/execution-page').then((m) => ({ default: m.ExecutionPage })),
+)
+const HistoryPage = lazy(() =>
+  import('@/features/workout/history/history-page').then((m) => ({ default: m.HistoryPage })),
+)
+const DietPage = lazy(() => import('@/features/diet/diet-page').then((m) => ({ default: m.DietPage })))
+const MealDetailPage = lazy(() =>
+  import('@/features/diet/meals/meal-detail-page').then((m) => ({ default: m.MealDetailPage })),
+)
+const ProfilePage = lazy(() =>
+  import('@/features/profile/profile-page').then((m) => ({ default: m.ProfilePage })),
+)
 
 export function AppRouter() {
   return (

@@ -6,6 +6,9 @@ import path from 'node:path'
 
 // https://vite.dev/config/
 export default defineConfig({
+  build: {
+    sourcemap: true,
+  },
   plugins: [
     react(),
     tailwindcss(),
