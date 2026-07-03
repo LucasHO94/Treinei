@@ -3,7 +3,7 @@ import { Search, Apple, ArrowRight } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
 import { useFoods, useFoodSearch } from '@/features/diet/lib/queries'
-import { findSubstitutes, equivalentQuantity, scaleMacros } from '@/features/diet/lib/macros'
+import { findSubstitutes, equivalentQuantity, scaleMacros, formatFoodQuantity } from '@/features/diet/lib/macros'
 import { swapMealItemFood } from '@/features/diet/lib/actions'
 import type { Food, MealItem } from '@/types/domain'
 
@@ -41,8 +41,8 @@ export function SwapFoodSheet({ open, onOpenChange, item, food }: SwapFoodSheetP
         <SheetHeader>
           <SheetTitle>Substituir {food.name}</SheetTitle>
           <SheetDescription>
-            Hoje: {item.quantity}× {food.portion_desc} · {Math.round(currentMacros.kcal)} kcal. A troca mantém as
-            calorias equivalentes.
+            Hoje: {formatFoodQuantity(food, item.quantity)} · {Math.round(currentMacros.kcal)} kcal. A troca mantém
+            as calorias equivalentes.
           </SheetDescription>
         </SheetHeader>
 
@@ -78,7 +78,7 @@ export function SwapFoodSheet({ open, onOpenChange, item, food }: SwapFoodSheetP
                   <div className="flex-1">
                     <p className="text-sm font-medium">{candidate.name}</p>
                     <p className="text-xs text-muted">
-                      {qty}× {candidate.portion_desc} · {Math.round(macros.kcal)} kcal · P{' '}
+                      {formatFoodQuantity(candidate, qty)} · {Math.round(macros.kcal)} kcal · P{' '}
                       {Math.round(macros.protein_g)}g
                     </p>
                   </div>

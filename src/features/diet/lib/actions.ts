@@ -2,7 +2,7 @@ import { db } from '@/lib/db'
 import { mutate } from '@/lib/db/mutate'
 import { requestSync } from '@/lib/sync/engine'
 import { upsertMealSchedule, deleteMealSchedule } from '@/features/notifications/lib/actions'
-import type { Meal, MealItem, MealLog, Food, NutritionGoals } from '@/types/domain'
+import type { Meal, MealItem, MealLog, Food, NutritionGoals, RecipeItem } from '@/types/domain'
 import { mealItemsMacros } from './macros'
 
 function nowIso() {
@@ -85,6 +85,13 @@ export async function swapMealItemFood(item: MealItem, newFoodId: string, newQua
 
 export async function removeMealItem(item: MealItem): Promise<void> {
   await mutate('meal_items', 'delete', item)
+}
+
+/** Aplica os ingredientes de uma receita como itens de uma refeição (V3). */
+export async function applyRecipeToMeal(mealId: string, recipeItems: RecipeItem[]): Promise<void> {
+  for (const item of recipeItems) {
+    await addMealItem(mealId, item.food_id, item.quantity)
+  }
 }
 
 // ---- Alimentos (catálogo + custom) ----

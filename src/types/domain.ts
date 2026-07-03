@@ -158,6 +158,9 @@ export interface Recipe {
   is_custom: boolean
   owner_id: string | null
   created_at: string
+  // Metadados da curadoria V3 — opcionais: receitas custom não precisam ter.
+  tags?: string[]
+  instructions?: string[]
 }
 
 export interface RecipeItem {

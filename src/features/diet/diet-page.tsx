@@ -40,7 +40,7 @@ export function DietPage() {
         <MealCard key={meal.id} meal={meal} />
       ))}
 
-      <RecipesSection />
+      <RecipesSection userId={userId} />
 
       <CreateMealDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>

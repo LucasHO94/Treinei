@@ -1,13 +1,14 @@
 import { db } from './index'
 import { LOCAL_MUSCLE_GROUPS, LOCAL_EXERCISES, LOCAL_FOODS } from './local-seed'
-import type { MuscleGroup, Exercise, Food } from '@/types/domain'
+import type { MuscleGroup, Exercise, Food, Recipe, RecipeItem } from '@/types/domain'
 
 /**
  * Versão do catálogo embarcado em public/data/*.json (gerado pelos scripts
- * scripts/import-exercises.mjs e scripts/import-foods.mjs). Incrementar lá e aqui
- * quando o dataset mudar — a hidratação re-executa apenas nessa transição.
+ * scripts/import-exercises.mjs, scripts/import-foods.mjs e scripts/build-recipes.mjs).
+ * Incrementar lá e aqui quando o dataset mudar — a hidratação re-executa apenas nessa
+ * transição.
  */
-const CATALOG_VERSION = 2
+const CATALOG_VERSION = 3
 const VERSION_KEY = 'treinei-catalog-version'
 
 interface ExercisesFile {
@@ -19,6 +20,12 @@ interface ExercisesFile {
 interface FoodsFile {
   version: number
   foods: Food[]
+}
+
+interface RecipesFile {
+  version: number
+  recipes: Recipe[]
+  recipeItems: RecipeItem[]
 }
 
 /**
@@ -41,17 +48,28 @@ export async function ensureLocalSeed(): Promise<void> {
   if (installed >= CATALOG_VERSION) return
 
   try {
-    const [exRes, foodRes] = await Promise.all([fetch('/data/exercises.json'), fetch('/data/foods.json')])
-    if (!exRes.ok || !foodRes.ok) throw new Error('catálogo indisponível')
+    const [exRes, foodRes, recipeRes] = await Promise.all([
+      fetch('/data/exercises.json'),
+      fetch('/data/foods.json'),
+      fetch('/data/recipes.json'),
+    ])
+    if (!exRes.ok || !foodRes.ok || !recipeRes.ok) throw new Error('catálogo indisponível')
     const exFile = (await exRes.json()) as ExercisesFile
     const foodFile = (await foodRes.json()) as FoodsFile
+    const recipeFile = (await recipeRes.json()) as RecipesFile
 
-    await db.transaction('rw', [db.muscle_groups, db.exercises, db.foods], async () => {
-      await db.muscle_groups.bulkPut(exFile.muscleGroups)
-      await db.exercises.bulkPut(exFile.exercises)
-      await db.foods.bulkPut(foodFile.foods)
-    })
-    localStorage.setItem(VERSION_KEY, String(exFile.version))
+    await db.transaction(
+      'rw',
+      [db.muscle_groups, db.exercises, db.foods, db.recipes, db.recipe_items],
+      async () => {
+        await db.muscle_groups.bulkPut(exFile.muscleGroups)
+        await db.exercises.bulkPut(exFile.exercises)
+        await db.foods.bulkPut(foodFile.foods)
+        await db.recipes.bulkPut(recipeFile.recipes)
+        await db.recipe_items.bulkPut(recipeFile.recipeItems)
+      },
+    )
+    localStorage.setItem(VERSION_KEY, String(CATALOG_VERSION))
   } catch {
     const [groupCount, exerciseCount, foodCount] = await Promise.all([
       db.muscle_groups.count(),

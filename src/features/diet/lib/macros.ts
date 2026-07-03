@@ -1,5 +1,24 @@
 import type { Food, MealItem, MealLog } from '@/types/domain'
 
+/** `quantity` é o multiplicador de porção (1 = `portion_grams`, quando conhecido). */
+export function gramsForQuantity(food: Pick<Food, 'portion_grams'>, quantity: number): number | null {
+  return food.portion_grams != null ? Math.round(quantity * food.portion_grams) : null
+}
+
+/** Converte gramas de volta para o multiplicador de porção gravado em `MealItem.quantity`. */
+export function quantityForGrams(food: Pick<Food, 'portion_grams'>, grams: number): number {
+  if (food.portion_grams == null || food.portion_grams <= 0) return grams
+  return grams / food.portion_grams
+}
+
+/** Formata a quantidade para exibição: gramas quando `portion_grams` é conhecido, senão "Nx porção". */
+export function formatFoodQuantity(food: Pick<Food, 'portion_grams' | 'portion_desc'>, quantity: number): string {
+  const grams = gramsForQuantity(food, quantity)
+  if (grams != null) return `${grams}g`
+  const rounded = Math.round(quantity * 100) / 100
+  return `${rounded}× ${food.portion_desc}`
+}
+
 export interface Macros {
   protein_g: number
   carbs_g: number
@@ -31,13 +50,18 @@ export function sumMacros(list: Macros[]): Macros {
   )
 }
 
-export function mealItemsMacros(items: MealItem[], foodMap: Map<string, Food>): Macros {
+/** Aceita qualquer item com food_id/quantity — serve tanto para MealItem quanto RecipeItem. */
+export function itemsMacros(items: { food_id: string; quantity: number }[], foodMap: Map<string, Food>): Macros {
   return sumMacros(
     items.map((item) => {
       const food = foodMap.get(item.food_id)
       return food ? scaleMacros(food, item.quantity) : EMPTY_MACROS
     }),
   )
+}
+
+export function mealItemsMacros(items: MealItem[], foodMap: Map<string, Food>): Macros {
+  return itemsMacros(items, foodMap)
 }
 
 export function mealLogsMacros(logs: MealLog[]): Macros {

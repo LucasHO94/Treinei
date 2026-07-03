@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Dumbbell, History } from 'lucide-react'
+import { Plus, Dumbbell, History, Sparkles } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useCurrentUserId } from '@/lib/auth/current-user'
@@ -34,6 +34,19 @@ export function WorkoutPage() {
           </Link>
         </Button>
       </div>
+
+      <Link
+        to="/treino/gerar"
+        className="flex items-center gap-3 rounded-lg border border-accent/40 bg-accent/10 p-4 transition-colors hover:bg-accent/15"
+      >
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent/20 text-accent">
+          <Sparkles className="size-5" />
+        </span>
+        <div>
+          <p className="font-semibold">Treino sugerido</p>
+          <p className="text-xs text-muted">Monte uma rotina pronta de acordo com seu objetivo</p>
+        </div>
+      </Link>
 
       {routines != null && routines.length === 0 && (
         <Card>

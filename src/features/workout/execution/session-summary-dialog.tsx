@@ -1,18 +1,28 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PartyPopper } from 'lucide-react'
+import { PartyPopper, Share2 } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { ShareWorkoutSheet } from './share-workout-sheet'
 
 interface SessionSummaryDialogProps {
   open: boolean
+  workoutName: string
   volumeKg: number
   durationMin: number
   setsCompleted: number
 }
 
-export function SessionSummaryDialog({ open, volumeKg, durationMin, setsCompleted }: SessionSummaryDialogProps) {
+export function SessionSummaryDialog({
+  open,
+  workoutName,
+  volumeKg,
+  durationMin,
+  setsCompleted,
+}: SessionSummaryDialogProps) {
   const navigate = useNavigate()
+  const [shareOpen, setShareOpen] = useState(false)
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && navigate('/treino')}>
@@ -47,8 +57,22 @@ export function SessionSummaryDialog({ open, volumeKg, durationMin, setsComplete
           ))}
         </div>
 
-        <Button onClick={() => navigate('/treino')}>Voltar para Treino</Button>
+        <div className="flex flex-col gap-2">
+          <Button variant="outline" onClick={() => setShareOpen(true)}>
+            <Share2 className="size-4" /> Compartilhar treino
+          </Button>
+          <Button onClick={() => navigate('/treino')}>Voltar para Treino</Button>
+        </div>
       </DialogContent>
+
+      <ShareWorkoutSheet
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        workoutName={workoutName}
+        durationMin={durationMin}
+        volumeKg={volumeKg}
+        setsCompleted={setsCompleted}
+      />
     </Dialog>
   )
 }

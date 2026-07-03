@@ -90,3 +90,24 @@ export function useMealLogsForDate(userId: string | undefined, date: string) {
 export function useNutritionGoals(userId: string | undefined) {
   return useLiveQuery(async () => (userId ? db.nutrition_goals.get(userId) : undefined), [userId])
 }
+
+// ---- Receitas (V3) ----
+
+export function useRecipes(mealKind: string | null) {
+  return useLiveQuery(
+    async () => {
+      const list = mealKind ? await db.recipes.where('meal_kind').equals(mealKind).toArray() : await db.recipes.toArray()
+      return list.sort((a, b) => a.name.localeCompare(b.name))
+    },
+    [mealKind],
+    [],
+  )
+}
+
+export function useRecipeItems(recipeId: string | undefined) {
+  return useLiveQuery(
+    async () => (recipeId ? db.recipe_items.where('recipe_id').equals(recipeId).toArray() : []),
+    [recipeId],
+    [],
+  )
+}

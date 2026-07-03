@@ -9,6 +9,7 @@ import type {
   WorkoutSession,
   SessionSet,
 } from '@/types/domain'
+import type { GeneratedWorkout } from '@/features/workout/generator/engine'
 
 const DEFAULT_REST_SECONDS = 60
 const DEFAULT_SET_COUNT = 3
@@ -225,4 +226,54 @@ export async function finishWorkoutSession(session: WorkoutSession, notes?: stri
     finished_at: nowIso(),
     notes: notes ?? session.notes,
   })
+}
+
+// ---- Gerador de treino por objetivo (V3) ----
+
+/** Igual a addExerciseToWorkout, mas com sets/reps/descanso/intensidade definidos pelo motor de geração. */
+async function addGeneratedExerciseToWorkout(
+  workoutId: string,
+  exerciseId: string,
+  config: Pick<GeneratedWorkout['exercises'][number], 'sets' | 'targetReps' | 'restSeconds' | 'intensity'>,
+): Promise<WorkoutExercise> {
+  const siblings = await db.workout_exercises.where('workout_id').equals(workoutId).toArray()
+  const workoutExercise: WorkoutExercise = {
+    id: crypto.randomUUID(),
+    workout_id: workoutId,
+    exercise_id: exerciseId,
+    sort_order: siblings.length,
+    rest_seconds: config.restSeconds,
+    notes: null,
+  }
+  await mutate('workout_exercises', 'insert', workoutExercise)
+
+  for (let i = 0; i < config.sets; i++) {
+    const set: PlannedSet = {
+      id: crypto.randomUUID(),
+      workout_exercise_id: workoutExercise.id,
+      set_number: i + 1,
+      target_reps: config.targetReps,
+      target_weight_kg: null,
+      intensity: config.intensity,
+    }
+    await mutate('planned_sets', 'insert', set)
+  }
+
+  return workoutExercise
+}
+
+/** Cria uma rotina completa (divisões + exercícios + séries planejadas) a partir do plano gerado. */
+export async function createGeneratedRoutine(
+  userId: string,
+  routineName: string,
+  divisions: GeneratedWorkout[],
+): Promise<Routine> {
+  const routine = await createRoutine(userId, routineName)
+  for (const division of divisions) {
+    const workout = await createWorkout(routine.id, division.name)
+    for (const item of division.exercises) {
+      await addGeneratedExerciseToWorkout(workout.id, item.exercise.id, item)
+    }
+  }
+  return routine
 }

@@ -20,13 +20,19 @@ export function ExecutionSetRow({
   placeholderWeight,
   onComplete,
 }: ExecutionSetRowProps) {
-  const [reps, setReps] = useState(existing?.reps != null ? String(existing.reps) : '')
-  const [weight, setWeight] = useState(existing?.weight_kg != null ? String(existing.weight_kg) : '')
-  const [intensity, setIntensity] = useState<Intensity>(existing?.intensity ?? plannedSet.intensity)
-  const done = !!existing
-
   const repsPlaceholder = placeholderReps ?? plannedSet.target_reps
   const weightPlaceholder = placeholderWeight ?? plannedSet.target_weight_kg
+
+  // Pré-preenchido com o planejado/última sessão (V3): um único toque no check já
+  // conclui a série com um valor real, sem exigir digitar antes. Editar continua opcional.
+  const [reps, setReps] = useState(
+    existing?.reps != null ? String(existing.reps) : repsPlaceholder != null ? String(repsPlaceholder) : '',
+  )
+  const [weight, setWeight] = useState(
+    existing?.weight_kg != null ? String(existing.weight_kg) : weightPlaceholder != null ? String(weightPlaceholder) : '',
+  )
+  const [intensity, setIntensity] = useState<Intensity>(existing?.intensity ?? plannedSet.intensity)
+  const done = !!existing
 
   return (
     <div

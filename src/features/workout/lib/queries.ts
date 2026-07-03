@@ -100,6 +100,22 @@ export function useWorkoutExercises(workoutId: string | undefined) {
   )
 }
 
+/** Total de séries planejadas por `workout_exercise_id` — usado na execução guiada para achar o exercício atual. */
+export function usePlannedSetsCountByExercise(workoutExerciseIds: string[]) {
+  const key = workoutExerciseIds.join(',')
+  return useLiveQuery(
+    async () => {
+      const map = new Map<string, number>()
+      for (const id of workoutExerciseIds) {
+        map.set(id, await db.planned_sets.where('workout_exercise_id').equals(id).count())
+      }
+      return map
+    },
+    [key],
+    new Map<string, number>(),
+  )
+}
+
 export function usePlannedSets(workoutExerciseId: string | undefined) {
   return useLiveQuery(
     async () => {

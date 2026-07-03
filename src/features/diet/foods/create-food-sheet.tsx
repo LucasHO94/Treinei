@@ -13,7 +13,7 @@ interface CreateFoodSheetProps {
   onCreated?: (food: Food) => void
 }
 
-const EMPTY_FORM = { portionDesc: '100g', protein: '', carbs: '', fat: '', kcal: '' }
+const EMPTY_FORM = { portionDesc: '100g', portionGrams: '100', protein: '', carbs: '', fat: '', kcal: '' }
 
 export function CreateFoodSheet({ open, onOpenChange, initialName, onCreated }: CreateFoodSheetProps) {
   const userId = useCurrentUserId()
@@ -40,7 +40,7 @@ export function CreateFoodSheet({ open, onOpenChange, initialName, onCreated }: 
       const food = await createCustomFood(userId, {
         name: name.trim(),
         portion_desc: form.portionDesc.trim() || '100g',
-        portion_grams: null,
+        portion_grams: form.portionGrams.trim() === '' ? null : Number(form.portionGrams) || null,
         protein_g: Number(form.protein) || 0,
         carbs_g: Number(form.carbs) || 0,
         fat_g: Number(form.fat) || 0,
@@ -71,14 +71,30 @@ export function CreateFoodSheet({ open, onOpenChange, initialName, onCreated }: 
             />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-muted">Porção</label>
-            <Input
-              placeholder="Ex.: 100g, 1 unidade, 1 colher"
-              value={form.portionDesc}
-              onChange={(e) => setForm((f) => ({ ...f, portionDesc: e.target.value }))}
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-muted">Porção</label>
+              <Input
+                placeholder="Ex.: 100g, 1 unidade, 1 colher"
+                value={form.portionDesc}
+                onChange={(e) => setForm((f) => ({ ...f, portionDesc: e.target.value }))}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-muted">Peso da porção (g)</label>
+              <Input
+                type="number"
+                inputMode="decimal"
+                placeholder="Ex.: 100"
+                value={form.portionGrams}
+                onChange={(e) => setForm((f) => ({ ...f, portionGrams: e.target.value }))}
+              />
+            </div>
           </div>
+          <p className="-mt-2 text-xs text-muted">
+            Informe o peso em gramas para poder editar a quantidade em gramas na refeição. Deixe em branco se não
+            for possível pesar (ex.: "1 fatia").
+          </p>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">

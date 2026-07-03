@@ -68,6 +68,15 @@ function SessionRow({
     setsByExercise.set(set.exercise_name, list)
   }
 
+  // Tempo por exercício (V3): derivado dos completed_at das séries, sem precisar de schema
+  // novo — do início da 1ª série ao fim da última série daquele exercício.
+  function exerciseDurationMin(exerciseSets: typeof sets): number | null {
+    if (!exerciseSets || exerciseSets.length < 2) return null
+    const timestamps = exerciseSets.map((s) => new Date(s.completed_at).getTime())
+    const spanMs = Math.max(...timestamps) - Math.min(...timestamps)
+    return Math.max(1, Math.round(spanMs / 60000))
+  }
+
   return (
     <Card>
       <button type="button" onClick={onToggle} className="flex w-full items-center justify-between p-4 text-left">
@@ -88,19 +97,25 @@ function SessionRow({
       {expanded && (
         <CardContent className="flex flex-col gap-3 pt-0">
           <p className="text-xs text-muted">Volume total: {Math.round(volumeKg)} kg</p>
-          {[...setsByExercise.entries()].map(([exerciseName, exerciseSets]) => (
-            <div key={exerciseName} className="flex flex-col gap-1">
-              <p className="text-sm font-medium">{exerciseName}</p>
-              <div className="flex flex-col gap-0.5">
-                {(exerciseSets ?? []).map((set) => (
-                  <p key={set.id} className="text-xs text-muted tabular-nums">
-                    Série {set.set_number}: {set.reps ?? '—'} reps × {set.weight_kg ?? '—'} kg
-                    {set.intensity && ` · ${INTENSITY_LABEL[set.intensity]}`}
-                  </p>
-                ))}
+          {[...setsByExercise.entries()].map(([exerciseName, exerciseSets]) => {
+            const durationMin = exerciseDurationMin(exerciseSets)
+            return (
+              <div key={exerciseName} className="flex flex-col gap-1">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-medium">{exerciseName}</p>
+                  {durationMin != null && <p className="text-xs text-muted">{durationMin} min</p>}
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  {(exerciseSets ?? []).map((set) => (
+                    <p key={set.id} className="text-xs text-muted tabular-nums">
+                      Série {set.set_number}: {set.reps ?? '—'} reps × {set.weight_kg ?? '—'} kg
+                      {set.intensity && ` · ${INTENSITY_LABEL[set.intensity]}`}
+                    </p>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </CardContent>
       )}
     </Card>

@@ -20,6 +20,9 @@ const ExecutionPage = lazy(() =>
 const HistoryPage = lazy(() =>
   import('@/features/workout/history/history-page').then((m) => ({ default: m.HistoryPage })),
 )
+const GenerateWorkoutPage = lazy(() =>
+  import('@/features/workout/generator/generate-workout-page').then((m) => ({ default: m.GenerateWorkoutPage })),
+)
 const DietPage = lazy(() => import('@/features/diet/diet-page').then((m) => ({ default: m.DietPage })))
 const MealDetailPage = lazy(() =>
   import('@/features/diet/meals/meal-detail-page').then((m) => ({ default: m.MealDetailPage })),
@@ -36,6 +39,7 @@ export function AppRouter() {
         <Route path="treino" element={<WorkoutPage />} />
         <Route path="treino/catalogo" element={<CatalogPage />} />
         <Route path="treino/historico" element={<HistoryPage />} />
+        <Route path="treino/gerar" element={<GenerateWorkoutPage />} />
         <Route path="treino/rotina/:routineId" element={<RoutineBuilderPage />} />
         <Route path="treino/executar/:workoutId" element={<ExecutionPage />} />
         <Route path="dieta" element={<DietPage />} />

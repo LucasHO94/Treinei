@@ -1,6 +1,14 @@
-import { ChefHat, Coffee, UtensilsCrossed, Moon, Cookie, Zap } from 'lucide-react'
+import { useState } from 'react'
+import { ChefHat, Coffee, UtensilsCrossed, Moon, Cookie, Zap, Clock } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import type { RecipeMealKind } from '@/types/domain'
+import { useRecipes, useMeals } from '@/features/diet/lib/queries'
+import { RecipeDetailSheet } from './recipe-detail-sheet'
+import { cn } from '@/lib/utils'
+import type { Recipe, RecipeMealKind } from '@/types/domain'
+
+interface RecipesSectionProps {
+  userId: string
+}
 
 const CATEGORIES: { kind: RecipeMealKind; label: string; icon: LucideIcon }[] = [
   { kind: 'cafe', label: 'Café da manhã', icon: Coffee },
@@ -12,33 +20,66 @@ const CATEGORIES: { kind: RecipeMealKind; label: string; icon: LucideIcon }[] = 
 ]
 
 /**
- * Seção de receitas sugeridas (V2 Fase E) — o schema (recipes/recipe_items) já está
- * pronto no banco; o conteúdo curado entra na V2.1. Esta seção reserva o espaço na
- * UI e comunica o que vem por aí.
+ * Sugestões de receitas por refeição (V3): ~60 receitas curadas próprias, cada uma com
+ * ingredientes mapeados ao catálogo TACO (macros sempre corretos) e modo de preparo
+ * autoral. Aplicar uma receita cria os itens direto na refeição escolhida.
  */
-export function RecipesSection() {
+export function RecipesSection({ userId }: RecipesSectionProps) {
+  const [activeKind, setActiveKind] = useState<RecipeMealKind>('cafe')
+  const recipes = useRecipes(activeKind)
+  const meals = useMeals(userId)
+  const [detail, setDetail] = useState<Recipe | null>(null)
+
   return (
     <section className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-base font-semibold">Receitas</h2>
-        <span className="rounded-full bg-accent/15 px-2.5 py-0.5 text-[11px] font-semibold text-accent">
-          Em breve
-        </span>
-      </div>
-      <div className="-mx-4 flex gap-2.5 overflow-x-auto px-4 pb-1">
+      <h2 className="text-base font-semibold">Receitas</h2>
+
+      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
         {CATEGORIES.map(({ kind, label, icon: Icon }) => (
-          <div
+          <button
             key={kind}
-            className="flex h-24 w-28 shrink-0 flex-col items-center justify-center gap-2 rounded-lg border border-border bg-card opacity-70"
+            type="button"
+            onClick={() => setActiveKind(kind)}
+            className={cn(
+              'flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
+              activeKind === kind ? 'bg-accent text-accent-foreground' : 'bg-surface text-muted hover:text-foreground',
+            )}
           >
-            <Icon className="size-6 text-accent" />
-            <p className="text-center text-xs font-medium text-muted">{label}</p>
-          </div>
+            <Icon className="size-3.5" /> {label}
+          </button>
         ))}
       </div>
-      <p className="text-xs text-muted">
-        Sugestões de receitas por refeição, com macros calculados e aplicação direta na sua dieta.
-      </p>
+
+      <div className="flex flex-col gap-2">
+        {(recipes ?? []).map((recipe) => (
+          <button
+            key={recipe.id}
+            type="button"
+            onClick={() => setDetail(recipe)}
+            className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-3 text-left hover:bg-surface"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium">{recipe.name}</p>
+              {recipe.description && <p className="truncate text-xs text-muted">{recipe.description}</p>}
+            </div>
+            {recipe.prep_minutes != null && (
+              <div className="flex shrink-0 items-center gap-1 text-xs text-muted">
+                <Clock className="size-3.5" /> {recipe.prep_minutes}min
+              </div>
+            )}
+          </button>
+        ))}
+
+        {recipes != null && recipes.length === 0 && (
+          <p className="rounded-lg border border-dashed border-border p-4 text-center text-xs text-muted">
+            Nenhuma receita nessa categoria ainda.
+          </p>
+        )}
+      </div>
+
+      {detail && (
+        <RecipeDetailSheet open onOpenChange={(open) => !open && setDetail(null)} recipe={detail} meals={meals ?? []} />
+      )}
     </section>
   )
 }
