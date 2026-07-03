@@ -13,8 +13,13 @@ const BG = [14, 17, 22, 255] // #0E1116
 const FG = [163, 230, 53, 255] // #A3E635 (lime-400)
 
 function setPixel(png, x, y, color) {
-  if (x < 0 || y < 0 || x >= png.width || y >= png.height) return
-  const idx = (png.width * y + x) << 2
+  // Coordenadas chegam fracionárias (círculos/retângulos calculados por escala) — sem
+  // arredondar antes do índice, a parte fracionária de "y" vaza pro "<< 2" e embaralha
+  // a posição real do pixel no buffer (bug que distorcia os ícones gerados).
+  const px = Math.round(x)
+  const py = Math.round(y)
+  if (px < 0 || py < 0 || px >= png.width || py >= png.height) return
+  const idx = (png.width * py + px) << 2
   png.data[idx] = color[0]
   png.data[idx + 1] = color[1]
   png.data[idx + 2] = color[2]
@@ -53,8 +58,10 @@ function generate(size, { maskable = false } = {}) {
   const png = new PNG({ width: size, height: size })
   fillRect(png, 0, 0, size, size, BG)
   // Ícone "any": halter ocupa quase toda a área.
-  // Ícone "maskable": precisa caber na safe zone circular (raio ~40% do centro).
-  drawDumbbell(png, size, maskable ? 0.5 : 0.7)
+  // Ícone "maskable": precisa caber na safe zone circular (raio de 40% do centro até
+  // a borda, padrão adotado por Android adaptive icons/iOS/etc.) — escala 0.36 deixa
+  // a ponta dos discos do halter a ~19,4% do centro, com folga dentro do limite de 40%.
+  drawDumbbell(png, size, maskable ? 0.36 : 0.7)
   return PNG.sync.write(png)
 }
 
