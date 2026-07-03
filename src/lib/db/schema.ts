@@ -13,6 +13,9 @@ export const SYNCED_TABLES = [
   'meal_logs',
   'nutrition_goals',
   'notification_schedules',
+  'user_profiles', // V3.3 — chaveado por user_id (como nutrition_goals)
+  'body_metrics', // V3.3
+  'body_photos', // V3.3 — só a referência de path; imagem fica no Storage
 ] as const
 
 export type SyncedTable = (typeof SYNCED_TABLES)[number]

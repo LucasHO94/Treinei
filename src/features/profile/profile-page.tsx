@@ -3,16 +3,23 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useCurrentUserId } from '@/lib/auth/current-user'
+import { useSession } from '@/lib/supabase/auth'
 import { useNutritionGoals } from '@/features/diet/lib/queries'
 import { setNutritionGoals } from '@/features/diet/lib/actions'
 import { PushPermissionCard } from '@/features/notifications/push-permission-card'
 import { WorkoutReminderCard } from '@/features/notifications/workout-reminder-card'
 import { IosInstallCard } from '@/features/notifications/onboarding/ios-install-card'
+import { ProfileHeader } from './profile-header'
+import { AccountCard } from './account-card'
+import { BodyMetricsCard } from './body-metrics-card'
+import { BodyPhotosCard } from './body-photos-card'
 
 const EMPTY_FORM = { protein: '', carbs: '', fat: '', kcal: '' }
 
 export function ProfilePage() {
   const userId = useCurrentUserId()
+  const session = useSession()
+  const canUpload = Boolean(session)
   const goals = useNutritionGoals(userId)
   const [form, setForm] = useState(EMPTY_FORM)
   const [loaded, setLoaded] = useState(false)
@@ -49,6 +56,18 @@ export function ProfilePage() {
   return (
     <div className="flex flex-col gap-4 p-4">
       <h1 className="text-2xl font-bold">Perfil</h1>
+
+      <ProfileHeader
+        userId={userId}
+        fallbackName={session?.user.user_metadata.full_name as string | undefined}
+        canUpload={canUpload}
+      />
+
+      <AccountCard />
+
+      <BodyMetricsCard userId={userId} />
+
+      <BodyPhotosCard userId={userId} canUpload={canUpload} />
 
       <Card>
         <CardHeader>

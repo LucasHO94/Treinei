@@ -66,11 +66,21 @@ export async function pullCatalog() {
 /** Baixa o estado atual do Supabase para o Dexie — usado no login e reconexão. */
 export async function pullAll(userId: string) {
   if (!isSupabaseConfigured) return
+  // Tabelas chaveadas/filtradas por usuário — filtro explícito (defensivo; o RLS já isola).
+  const userScoped = new Set<string>([
+    'nutrition_goals',
+    'user_profiles',
+    'body_metrics',
+    'body_photos',
+  ])
+  // exercises/foods: puxa só os CUSTOM do usuário. O catálogo nativo (owner_id null) vem
+  // do JSON local (ensureLocalSeed) — puxá-lo do servidor desperdiça banda e poderia
+  // sobrescrever os metadados ricos do catálogo com linhas base.
+  const customOwned = new Set<string>(['exercises', 'foods'])
   for (const table of SYNCED_TABLES) {
-    const query =
-      table === 'nutrition_goals'
-        ? supabase.from(table).select('*').eq('user_id', userId)
-        : supabase.from(table).select('*')
+    let query = supabase.from(table).select('*')
+    if (customOwned.has(table)) query = query.eq('owner_id', userId)
+    else if (userScoped.has(table)) query = query.eq('user_id', userId)
 
     const { data, error } = await query
     if (error || !data) continue

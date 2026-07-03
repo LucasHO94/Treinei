@@ -16,6 +16,9 @@ import type {
   NotificationSchedule,
   Recipe,
   RecipeItem,
+  UserProfile,
+  BodyMetric,
+  BodyPhoto,
 } from '@/types/domain'
 import type { OutboxEntry } from './schema'
 
@@ -41,6 +44,9 @@ export class TreineiDB extends Dexie {
   notification_schedules!: EntityTable<NotificationSchedule, 'id'>
   recipes!: EntityTable<Recipe, 'id'>
   recipe_items!: EntityTable<RecipeItem, 'id'>
+  user_profiles!: EntityTable<UserProfile, 'user_id'>
+  body_metrics!: EntityTable<BodyMetric, 'id'>
+  body_photos!: EntityTable<BodyPhoto, 'id'>
   outbox!: EntityTable<OutboxEntry, 'id'>
 
   constructor() {
@@ -72,6 +78,12 @@ export class TreineiDB extends Dexie {
     this.version(3).stores({
       recipes: 'id, meal_kind, is_custom, owner_id',
       recipe_items: 'id, recipe_id, food_id',
+    })
+    // V3.3: perfil profissional — avatar, altura, histórico de peso e fotos corporais.
+    this.version(4).stores({
+      user_profiles: 'user_id',
+      body_metrics: 'id, user_id, measured_on',
+      body_photos: 'id, user_id, taken_on',
     })
   }
 }

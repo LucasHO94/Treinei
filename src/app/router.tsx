@@ -1,7 +1,8 @@
 import { lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { AppLayout } from './layout'
+import { ProtectedShell } from './protected-shell'
 import { TodayPage } from '@/features/today/today-page'
+import { AuthPage } from '@/features/auth/auth-page'
 
 // Code-splitting por rota: só a aba "Hoje" (index) entra no bundle inicial —
 // as demais carregam sob demanda, reduzindo o JS avaliado no primeiro paint.
@@ -30,11 +31,16 @@ const MealDetailPage = lazy(() =>
 const ProfilePage = lazy(() =>
   import('@/features/profile/profile-page').then((m) => ({ default: m.ProfilePage })),
 )
+const ResetPasswordPage = lazy(() =>
+  import('@/features/auth/reset-password-page').then((m) => ({ default: m.ResetPasswordPage })),
+)
 
 export function AppRouter() {
   return (
     <Routes>
-      <Route element={<AppLayout />}>
+      <Route path="entrar" element={<AuthPage />} />
+      <Route path="recuperar-senha" element={<ResetPasswordPage />} />
+      <Route element={<ProtectedShell />}>
         <Route index element={<TodayPage />} />
         <Route path="treino" element={<WorkoutPage />} />
         <Route path="treino/catalogo" element={<CatalogPage />} />

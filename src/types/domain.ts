@@ -170,6 +170,32 @@ export interface RecipeItem {
   quantity: number
 }
 
+// V3.3: perfil profissional (foto, altura, peso, fotos corporais).
+export interface UserProfile {
+  user_id: string
+  full_name: string | null
+  avatar_path: string | null
+  height_cm: number | null
+  updated_at: string
+}
+
+export interface BodyMetric {
+  id: string
+  user_id: string
+  measured_on: string // 'YYYY-MM-DD'
+  weight_kg: number | null
+  height_cm: number | null
+  created_at: string
+}
+
+export interface BodyPhoto {
+  id: string
+  user_id: string
+  storage_path: string
+  taken_on: string // 'YYYY-MM-DD'
+  created_at: string
+}
+
 export interface PushSubscriptionRecord {
   id: string
   user_id: string
