@@ -1,11 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { usePlannedSets } from '@/features/workout/lib/queries'
 import { ExecutionSetRow } from './execution-set-row'
-import type { Intensity, SessionSet, WorkoutExercise } from '@/types/domain'
+import type { Exercise, Intensity, SessionSet, WorkoutExercise } from '@/types/domain'
 
 interface ExecutionExerciseBlockProps {
   workoutExercise: WorkoutExercise
-  exerciseName: string
+  exercise: Exercise | undefined
   sessionSetMap: Map<string, SessionSet>
   lastSetMap: Map<string, SessionSet>
   onCompleteSet: (
@@ -13,21 +13,31 @@ interface ExecutionExerciseBlockProps {
     setNumber: number,
     values: { reps: number | null; weight_kg: number | null; intensity: Intensity },
   ) => void
+  /** Abre o overlay de execução — tocar no nome do exercício (paridade com o app modelo). */
+  onShowDetail: (exercise: Exercise) => void
 }
 
 export function ExecutionExerciseBlock({
   workoutExercise,
-  exerciseName,
+  exercise,
   sessionSetMap,
   lastSetMap,
   onCompleteSet,
+  onShowDetail,
 }: ExecutionExerciseBlockProps) {
   const plannedSets = usePlannedSets(workoutExercise.id)
+  const exerciseName = exercise?.name ?? 'Exercício removido'
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{exerciseName}</CardTitle>
+        {exercise ? (
+          <button type="button" onClick={() => onShowDetail(exercise)} className="text-left">
+            <CardTitle className="text-primary underline-offset-4 hover:underline">{exerciseName}</CardTitle>
+          </button>
+        ) : (
+          <CardTitle>{exerciseName}</CardTitle>
+        )}
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
         <div className="grid grid-cols-[1.5rem_1fr_1fr_1fr_2.5rem] gap-2 px-1 text-xs font-medium text-muted">

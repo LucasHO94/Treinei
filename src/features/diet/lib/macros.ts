@@ -50,3 +50,48 @@ export function mealLogsMacros(logs: MealLog[]): Macros {
     })),
   )
 }
+
+// ---- Substituição de alimentos (V2) ----
+
+/**
+ * Sugere substitutos para um alimento: mesma categoria, kcal por 100g dentro de
+ * ±25%, ordenados pela menor distância combinada de kcal e proteína (os dois
+ * eixos que mais importam numa troca de dieta). Retorna no máximo `limit`.
+ */
+export function findSubstitutes(food: Food, allFoods: Food[], limit = 8): Food[] {
+  const per100 = (f: Food) => {
+    const grams = f.portion_grams || 100
+    return { kcal: (f.kcal / grams) * 100, protein: (f.protein_g / grams) * 100 }
+  }
+  const base = per100(food)
+  if (base.kcal <= 0) return []
+
+  return allFoods
+    .filter(
+      (f) =>
+        f.id !== food.id &&
+        f.category != null &&
+        f.category === food.category &&
+        Math.abs(per100(f).kcal - base.kcal) / base.kcal <= 0.25,
+    )
+    .map((f) => {
+      const p = per100(f)
+      const kcalDist = Math.abs(p.kcal - base.kcal) / base.kcal
+      const proteinDist = base.protein > 0 ? Math.abs(p.protein - base.protein) / base.protein : 0
+      return { food: f, score: kcalDist + proteinDist * 0.5 }
+    })
+    .sort((a, b) => a.score - b.score)
+    .slice(0, limit)
+    .map((s) => s.food)
+}
+
+/**
+ * Quantidade equivalente em kcal ao trocar `from` (com `quantity` porções) por `to`.
+ * Arredonda para múltiplos de 0.25 porção (mínimo 0.25).
+ */
+export function equivalentQuantity(from: Food, quantity: number, to: Food): number {
+  if (to.kcal <= 0) return quantity
+  const targetKcal = from.kcal * quantity
+  const raw = targetKcal / to.kcal
+  return Math.max(0.25, Math.round(raw * 4) / 4)
+}

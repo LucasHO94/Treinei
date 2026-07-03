@@ -17,7 +17,10 @@ export default defineConfig({
       srcDir: 'src/sw',
       filename: 'service-worker.ts',
       injectManifest: {
-        globPatterns: ['**/*.{js,css,html,svg,png,jpg,jpeg,webp,woff2}'],
+        // json inclui public/data/*.json (catálogo de exercícios/alimentos) — ~250KB
+        // gzip no wire; garante hidratação do Dexie offline após instalar o PWA.
+        globPatterns: ['**/*.{js,css,html,svg,png,jpg,jpeg,webp,woff2,json}'],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
       },
       registerType: 'prompt',
       devOptions: {

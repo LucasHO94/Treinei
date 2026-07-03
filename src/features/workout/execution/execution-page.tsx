@@ -16,7 +16,8 @@ import { useRestTimer } from './use-rest-timer'
 import { RestTimerSheet } from './rest-timer-sheet'
 import { ExecutionExerciseBlock } from './execution-exercise-block'
 import { SessionSummaryDialog } from './session-summary-dialog'
-import type { Intensity, SessionSet, WorkoutExercise } from '@/types/domain'
+import { ExerciseDetailOverlay } from '@/features/workout/catalog/exercise-detail-overlay'
+import type { Exercise, Intensity, SessionSet, WorkoutExercise } from '@/types/domain'
 
 export function ExecutionPage() {
   const { workoutId } = useParams<{ workoutId: string }>()
@@ -32,6 +33,7 @@ export function ExecutionPage() {
   const restTimer = useRestTimer()
 
   const [summary, setSummary] = useState<{ volumeKg: number; durationMin: number; setsCompleted: number }>()
+  const [detailExercise, setDetailExercise] = useState<Exercise | null>(null)
 
   const sessionSetMap = useMemo(
     () => new Map((sessionSets ?? []).map((s) => [`${s.workout_exercise_id}_${s.set_number}`, s])),
@@ -90,12 +92,15 @@ export function ExecutionPage() {
         <ExecutionExerciseBlock
           key={we.id}
           workoutExercise={we}
-          exerciseName={exerciseMap.get(we.exercise_id)?.name ?? 'Exercício removido'}
+          exercise={exerciseMap.get(we.exercise_id)}
           sessionSetMap={sessionSetMap}
           lastSetMap={lastSetMap}
           onCompleteSet={handleCompleteSet}
+          onShowDetail={setDetailExercise}
         />
       ))}
+
+      <ExerciseDetailOverlay exercise={detailExercise} onClose={() => setDetailExercise(null)} />
 
       {workoutExercises != null && workoutExercises.length === 0 && (
         <p className="text-sm text-muted">Esta divisão ainda não tem exercícios. Volte ao builder para adicioná-los.</p>

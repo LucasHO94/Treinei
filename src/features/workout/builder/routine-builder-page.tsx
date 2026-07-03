@@ -16,7 +16,9 @@ import {
   removeExerciseFromWorkout,
   reorderWorkoutExercises,
 } from '@/features/workout/lib/actions'
+import { Skeleton } from '@/components/ui/skeleton'
 import { ExercisePickerSheet } from '@/features/workout/catalog/exercise-picker-sheet'
+import { ExerciseDetailOverlay } from '@/features/workout/catalog/exercise-detail-overlay'
 import { PlannedSetEditorSheet } from './planned-set-editor-sheet'
 import { WorkoutExerciseRow } from './workout-exercise-row'
 import { cn } from '@/lib/utils'
@@ -40,6 +42,7 @@ export function RoutineBuilderPage() {
   const [selectedWorkoutId, setActiveWorkoutId] = useState<string>()
   const [pickerOpen, setPickerOpen] = useState(false)
   const [editingExercise, setEditingExercise] = useState<WorkoutExercise>()
+  const [detailExercise, setDetailExercise] = useState<Exercise | null>(null)
 
   // Deriva a divisão ativa em vez de "corrigir" o estado via efeito: evita uma corrida
   // onde o efeito reverte a seleção recém-criada antes da live query do Dexie atualizar
@@ -53,8 +56,16 @@ export function RoutineBuilderPage() {
 
   if (!routine) {
     return (
-      <div className="p-4">
-        <p className="text-sm text-muted">Carregando...</p>
+      <div className="flex flex-col gap-4 p-4">
+        <Skeleton className="h-7 w-48" />
+        <div className="flex gap-2">
+          <Skeleton className="h-9 w-14 rounded-full" />
+          <Skeleton className="h-9 w-14 rounded-full" />
+          <Skeleton className="h-9 w-14 rounded-full" />
+        </div>
+        <Skeleton className="h-20 w-full" />
+        <Skeleton className="h-20 w-full" />
+        <Skeleton className="h-20 w-full" />
       </div>
     )
   }
@@ -80,9 +91,11 @@ export function RoutineBuilderPage() {
     setActiveWorkoutId(undefined)
   }
 
-  async function handleSelectExercise(exercise: Exercise) {
+  async function handleAddExercises(exercises: Exercise[]) {
     if (!activeWorkoutId) return
-    await addExerciseToWorkout(activeWorkoutId, exercise.id)
+    for (const exercise of exercises) {
+      await addExerciseToWorkout(activeWorkoutId, exercise.id)
+    }
   }
 
   async function handleMove(index: number, direction: -1 | 1) {
@@ -150,13 +163,14 @@ export function RoutineBuilderPage() {
             <WorkoutExerciseRow
               key={we.id}
               workoutExercise={we}
-              exerciseName={exerciseMap.get(we.exercise_id)?.name ?? 'Exercício removido'}
+              exercise={exerciseMap.get(we.exercise_id)}
               isFirst={index === 0}
               isLast={index === (workoutExercises?.length ?? 1) - 1}
               onMoveUp={() => void handleMove(index, -1)}
               onMoveDown={() => void handleMove(index, 1)}
               onRemove={() => void removeExerciseFromWorkout(we.id)}
               onOpen={() => setEditingExercise(we)}
+              onShowDetail={() => setDetailExercise(exerciseMap.get(we.exercise_id) ?? null)}
             />
           ))}
 
@@ -166,7 +180,9 @@ export function RoutineBuilderPage() {
         </div>
       )}
 
-      <ExercisePickerSheet open={pickerOpen} onOpenChange={setPickerOpen} onSelect={handleSelectExercise} />
+      <ExercisePickerSheet open={pickerOpen} onOpenChange={setPickerOpen} onAdd={handleAddExercises} />
+
+      <ExerciseDetailOverlay exercise={detailExercise} onClose={() => setDetailExercise(null)} />
 
       <PlannedSetEditorSheet
         open={!!editingExercise}

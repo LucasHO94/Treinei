@@ -1,21 +1,65 @@
 import { db } from './index'
 import { LOCAL_MUSCLE_GROUPS, LOCAL_EXERCISES, LOCAL_FOODS } from './local-seed'
+import type { MuscleGroup, Exercise, Food } from '@/types/domain'
 
 /**
- * Garante que o catálogo nativo (grupos musculares, exercícios, alimentos) exista
- * localmente mesmo sem backend configurado — o app é offline-first e não pode
- * depender de um pull do Supabase para funcionar no primeiro uso (RF01/RF11).
- * Idempotente: só popula o que ainda não existir, nunca sobrescreve dados que já
- * tenham sido sincronizados de um projeto Supabase real.
+ * Versão do catálogo embarcado em public/data/*.json (gerado pelos scripts
+ * scripts/import-exercises.mjs e scripts/import-foods.mjs). Incrementar lá e aqui
+ * quando o dataset mudar — a hidratação re-executa apenas nessa transição.
+ */
+const CATALOG_VERSION = 2
+const VERSION_KEY = 'treinei-catalog-version'
+
+interface ExercisesFile {
+  version: number
+  muscleGroups: MuscleGroup[]
+  exercises: Exercise[]
+}
+
+interface FoodsFile {
+  version: number
+  foods: Food[]
+}
+
+/**
+ * Garante o catálogo nativo (grupos, exercícios, alimentos) no Dexie.
+ *
+ * V2: o catálogo completo (~873 exercícios + ~613 alimentos) vive em
+ * public/data/*.json — fora do bundle JS — e é hidratado aqui via fetch com
+ * controle de versão. Os JSONs entram no precache do Service Worker, então após
+ * a instalação do PWA a hidratação funciona offline.
+ *
+ * bulkPut é idempotente e só toca registros nativos (IDs fixos do catálogo);
+ * exercícios/alimentos custom do usuário têm UUIDs próprios e nunca são afetados.
+ *
+ * Fallback: se o fetch falhar (primeiro load já offline, sem SW instalado) e o
+ * banco estiver vazio, semeia o catálogo mínimo V1 embutido no bundle para o app
+ * continuar utilizável; a próxima visita online completa a hidratação.
  */
 export async function ensureLocalSeed(): Promise<void> {
-  const [groupCount, exerciseCount, foodCount] = await Promise.all([
-    db.muscle_groups.count(),
-    db.exercises.count(),
-    db.foods.count(),
-  ])
+  const installed = Number(localStorage.getItem(VERSION_KEY) ?? '0')
+  if (installed >= CATALOG_VERSION) return
 
-  if (groupCount === 0) await db.muscle_groups.bulkPut(LOCAL_MUSCLE_GROUPS)
-  if (exerciseCount === 0) await db.exercises.bulkPut(LOCAL_EXERCISES)
-  if (foodCount === 0) await db.foods.bulkPut(LOCAL_FOODS)
+  try {
+    const [exRes, foodRes] = await Promise.all([fetch('/data/exercises.json'), fetch('/data/foods.json')])
+    if (!exRes.ok || !foodRes.ok) throw new Error('catálogo indisponível')
+    const exFile = (await exRes.json()) as ExercisesFile
+    const foodFile = (await foodRes.json()) as FoodsFile
+
+    await db.transaction('rw', [db.muscle_groups, db.exercises, db.foods], async () => {
+      await db.muscle_groups.bulkPut(exFile.muscleGroups)
+      await db.exercises.bulkPut(exFile.exercises)
+      await db.foods.bulkPut(foodFile.foods)
+    })
+    localStorage.setItem(VERSION_KEY, String(exFile.version))
+  } catch {
+    const [groupCount, exerciseCount, foodCount] = await Promise.all([
+      db.muscle_groups.count(),
+      db.exercises.count(),
+      db.foods.count(),
+    ])
+    if (groupCount === 0) await db.muscle_groups.bulkPut(LOCAL_MUSCLE_GROUPS)
+    if (exerciseCount === 0) await db.exercises.bulkPut(LOCAL_EXERCISES)
+    if (foodCount === 0) await db.foods.bulkPut(LOCAL_FOODS)
+  }
 }

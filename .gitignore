@@ -13,6 +13,9 @@ dist-ssr
 dev-dist
 *.local
 
+# Cache dos datasets baixados pelos scripts de importação (regenerável)
+scripts/.cache/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

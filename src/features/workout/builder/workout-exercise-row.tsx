@@ -1,36 +1,51 @@
-import { ChevronUp, ChevronDown, Trash2, Dumbbell } from 'lucide-react'
+import { ChevronUp, ChevronDown, Trash2 } from 'lucide-react'
 import { usePlannedSets } from '@/features/workout/lib/queries'
-import type { WorkoutExercise } from '@/types/domain'
+import { ExerciseMedia } from '@/components/exercise-media'
+import type { Exercise, WorkoutExercise } from '@/types/domain'
 
 interface WorkoutExerciseRowProps {
   workoutExercise: WorkoutExercise
-  exerciseName: string
+  exercise: Exercise | undefined
   isFirst: boolean
   isLast: boolean
   onMoveUp: () => void
   onMoveDown: () => void
   onRemove: () => void
   onOpen: () => void
+  /** Abre o overlay de execução (mídia + instruções) — tocar na miniatura. */
+  onShowDetail: () => void
 }
 
 export function WorkoutExerciseRow({
   workoutExercise,
-  exerciseName,
+  exercise,
   isFirst,
   isLast,
   onMoveUp,
   onMoveDown,
   onRemove,
   onOpen,
+  onShowDetail,
 }: WorkoutExerciseRowProps) {
   const sets = usePlannedSets(workoutExercise.id)
+  const exerciseName = exercise?.name ?? 'Exercício removido'
 
   return (
     <div className="flex items-center gap-2 rounded-lg border border-border bg-card p-3">
+      <button
+        type="button"
+        onClick={onShowDetail}
+        aria-label={`Ver execução de ${exerciseName}`}
+        className="shrink-0"
+      >
+        <ExerciseMedia
+          exercise={exercise ?? { name: exerciseName, images: null, media_url: null }}
+          animate={false}
+          className="size-12 rounded-md"
+        />
+      </button>
+
       <button type="button" onClick={onOpen} className="flex flex-1 items-center gap-3 text-left">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-surface text-muted">
-          <Dumbbell className="size-4" />
-        </div>
         <div className="flex-1">
           <p className="text-sm font-medium">{exerciseName}</p>
           <p className="text-xs text-muted">

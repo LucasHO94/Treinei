@@ -7,6 +7,7 @@ import { useMeals } from './lib/queries'
 import { MealCard } from './meals/meal-card'
 import { CreateMealDialog } from './meals/create-meal-dialog'
 import { DayMacroSummary } from './tracking/day-macro-summary'
+import { RecipesSection } from './recipes/recipes-section'
 
 export function DietPage() {
   const userId = useCurrentUserId()
@@ -38,6 +39,8 @@ export function DietPage() {
       {(meals ?? []).map((meal) => (
         <MealCard key={meal.id} meal={meal} />
       ))}
+
+      <RecipesSection />
 
       <CreateMealDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>

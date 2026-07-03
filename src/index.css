@@ -63,3 +63,23 @@
   display: flex;
   flex-direction: column;
 }
+
+/* Crossfade entre as 2 fotos de execução (início/fim do movimento) — simula o
+   vídeo em loop do catálogo sem custo de vídeo real. A 2ª imagem alterna a
+   opacidade; a 1ª fica fixa por baixo. */
+@keyframes exercise-crossfade {
+  0%, 40% { opacity: 0; }
+  50%, 90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.exercise-crossfade-top {
+  animation: exercise-crossfade 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exercise-crossfade-top {
+    animation: none;
+    opacity: 0;
+  }
+}

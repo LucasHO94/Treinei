@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useMeal, useMealItems, useFoodMap } from '@/features/diet/lib/queries'
 import { updateMeal, deleteMeal, addMealItem } from '@/features/diet/lib/actions'
 import { mealItemsMacros } from '@/features/diet/lib/macros'
@@ -19,8 +20,14 @@ export function MealDetailPage() {
 
   if (!meal) {
     return (
-      <div className="p-4">
-        <p className="text-sm text-muted">Carregando...</p>
+      <div className="flex flex-col gap-4 p-4">
+        <Skeleton className="h-7 w-40" />
+        <div className="flex gap-3">
+          <Skeleton className="h-11 flex-[2]" />
+          <Skeleton className="h-11 flex-1" />
+        </div>
+        <Skeleton className="h-16 w-full" />
+        <Skeleton className="h-16 w-full" />
       </div>
     )
   }

@@ -1,0 +1,302 @@
+[
+  {
+    "id": "d1dad43c-d670-4003-b53d-47535b4a7694",
+    "muscle_group_id": 1,
+    "name": "Supino Reto no Aparelho",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "7611981b-dcd1-4f21-b730-c30996d7a85b",
+    "muscle_group_id": 1,
+    "name": "Supino Inclinado no Aparelho",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "057010ff-3556-41e1-9130-c035fcf0ae7d",
+    "muscle_group_id": 1,
+    "name": "Supino Reto c/ Halteres",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "f11fd4b3-a0f3-4964-986f-972555bbcb51",
+    "muscle_group_id": 1,
+    "name": "Supino Inclinado c/ Halteres",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "c84bfc1d-e59f-443d-8f20-bb96cd666e89",
+    "muscle_group_id": 1,
+    "name": "Crucifixo no Voador",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "d2e9acd7-b5f0-4222-872a-83432934053c",
+    "muscle_group_id": 1,
+    "name": "Pullover - v. Peito",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "76d76bbc-c833-4540-b343-e5379e0c3758",
+    "muscle_group_id": 2,
+    "name": "Puxada pela Frente - Pegada Aberta",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "54086923-ab67-4529-ad6c-20b96bce0478",
+    "muscle_group_id": 2,
+    "name": "Puxada pela Frente - Pegada Invertida",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "3d92644a-956c-45e7-ad72-3631edd679b9",
+    "muscle_group_id": 2,
+    "name": "Remada no Aparelho",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "9e01c250-d973-43d7-9c49-54a4367376f7",
+    "muscle_group_id": 2,
+    "name": "Remada Vertical no Aparelho",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "c7426e19-2b4d-4465-9365-83885141473f",
+    "muscle_group_id": 2,
+    "name": "Remada Sentado - Pegada Invertida",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "ba682c1f-0806-47ce-9065-d7abf4c867e5",
+    "muscle_group_id": 2,
+    "name": "Remada Unilateral c/ Halter (Serrote)",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "9c435821-71f7-47f0-8ce6-810ee7ec16c1",
+    "muscle_group_id": 2,
+    "name": "Crucifixo Inverso no Voador",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "ceedf772-7294-4c4e-b632-94e34821d876",
+    "muscle_group_id": 3,
+    "name": "Desenvolvimento no Aparelho",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "8677c76a-4296-4291-8b20-948a4b695daf",
+    "muscle_group_id": 3,
+    "name": "Desenvolvimento c/ Halteres",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "80924ee3-190d-49de-a2f9-9e1f865830f2",
+    "muscle_group_id": 3,
+    "name": "Elevação Lateral",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "43cb978e-3ef1-445c-9c4b-abe09a9e4f0b",
+    "muscle_group_id": 3,
+    "name": "Elevação Frontal c/ Halteres",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "66bdc3f7-9980-4aca-82f5-3c5782f385fc",
+    "muscle_group_id": 3,
+    "name": "Elevação Frontal c/ Anilha",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "3021382c-aba5-4077-a330-fb5a7e5d6d34",
+    "muscle_group_id": 3,
+    "name": "Remada Alta c/ Cabo",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "63eafcb3-cbe5-4300-a146-8a86eaac3f0f",
+    "muscle_group_id": 4,
+    "name": "Rosca Direta no Cabo",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "eca86675-6f5a-48c7-97bf-bc4dd50aae2a",
+    "muscle_group_id": 4,
+    "name": "Rosca Direta c/ Cabo - Pegada Invertida",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "b9009564-14a6-497b-88ff-1c0b23123ebb",
+    "muscle_group_id": 4,
+    "name": "Rosca Inclinada",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "5002eada-bcb3-485c-abf1-cc07ced73110",
+    "muscle_group_id": 4,
+    "name": "Rosca Concentrada",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "c304f28b-7740-4c50-96b4-9630354a9a36",
+    "muscle_group_id": 4,
+    "name": "Rosca c/ Halteres",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "da72bbc1-0959-49ea-8540-4ff75c4ca63d",
+    "muscle_group_id": 4,
+    "name": "Rosca Hammer c/ Cabo - Corda",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "e2d45927-2967-452a-85f6-3a01fa29c246",
+    "muscle_group_id": 4,
+    "name": "Scott Martelo c/ Halteres",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "4a559cc0-780e-4799-82a5-14d7db30d903",
+    "muscle_group_id": 5,
+    "name": "Tríceps Francês",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "42ad7e3c-9db0-4222-8f89-09f0ea2462bf",
+    "muscle_group_id": 5,
+    "name": "Tríceps Francês Unilateral",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "dc5314de-1c31-4c44-b393-25f88dce8c11",
+    "muscle_group_id": 5,
+    "name": "Extensão de Cotovelos no Cabo - Pegada Invertida",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "22f2b27d-c8e3-4a3f-848a-cf5f87dfc5b7",
+    "muscle_group_id": 5,
+    "name": "Extensão de Cotovelos na Roldana Alta",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "6e901510-4463-490e-9261-bdc4ff9161fe",
+    "muscle_group_id": 5,
+    "name": "Extensão de Cotovelos c/ Halteres",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "b31c55e3-d709-411d-b7a5-de9dc6ed8d7f",
+    "muscle_group_id": 5,
+    "name": "Mergulho no Aparelho - v. Tríceps",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "030d9711-6763-4290-83eb-6d64582febb5",
+    "muscle_group_id": 6,
+    "name": "Rosca de Punho",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "ddc1857d-6d3f-4308-9df0-8222a0325c06",
+    "muscle_group_id": 6,
+    "name": "Rosca de Punho Invertida",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "e796fd94-4c19-4540-be88-56134b5070fe",
+    "muscle_group_id": 7,
+    "name": "Encolhimento de Ombros c/ Halteres",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "98bddc82-a9da-4b5d-804f-173676818c7e",
+    "muscle_group_id": 8,
+    "name": "Infra no Solo",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "9915eaa1-a3cd-4256-b819-c1abd2679082",
+    "muscle_group_id": 8,
+    "name": "Jack Knifes",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "55a2e7aa-33b1-44fb-9683-5d73058c2cbd",
+    "muscle_group_id": 9,
+    "name": "Legpress",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "1c31d143-eda9-4856-b86c-103a758521b6",
+    "muscle_group_id": 9,
+    "name": "Legpress Horizontal",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "e4213805-9a24-4406-965e-eecbeb668cd2",
+    "muscle_group_id": 9,
+    "name": "Agachamento no Hack",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "bd9fef1e-ab98-46f3-b0e2-94ea9843ef86",
+    "muscle_group_id": 9,
+    "name": "Extensão de Joelhos",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "4d4636e6-bb00-450c-9970-ff1d3fbe37cc",
+    "muscle_group_id": 9,
+    "name": "Flexão de Joelhos - Deitado",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "6e04b2e4-9299-455d-9086-a15465da46d5",
+    "muscle_group_id": 9,
+    "name": "Flexão de Joelhos no Aparelho - Sentado",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "3e7da9de-fbdf-493a-bc0f-441975c0e70c",
+    "muscle_group_id": 9,
+    "name": "Adução de Coxa Sentado",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "cf7c0bf4-2225-4eae-aae5-cf7617b96d97",
+    "muscle_group_id": 9,
+    "name": "Abdução de Coxa Sentado",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "e28336be-d022-4e00-bfcd-6ed261a5a651",
+    "muscle_group_id": 10,
+    "name": "Elevação de Quadril",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "ad03f4d4-c40b-434f-a0b2-ef6e998afc77",
+    "muscle_group_id": 11,
+    "name": "Panturrilha no Leg Press",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "d516a5fb-7dec-453b-a920-3339ddf6c5b6",
+    "muscle_group_id": 11,
+    "name": "Panturrilha em Pé no Aparelho",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "0fd6d098-7662-4d3d-9c2e-f7e1ca9b3f67",
+    "muscle_group_id": 12,
+    "name": "Agachamento Livre sem Peso",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "7c737de4-9f9e-4b4a-a524-7c670031a3c4",
+    "muscle_group_id": 12,
+    "name": "Ondas de Pulso - Para Baixo",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  }
+]

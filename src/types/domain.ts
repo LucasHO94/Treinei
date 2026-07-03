@@ -18,6 +18,19 @@ export interface Exercise {
   is_custom: boolean
   owner_id: string | null
   created_at: string
+  // Metadados do catálogo V2 (free-exercise-db) — opcionais: exercícios custom
+  // e registros criados antes da V2 não os possuem.
+  name_en?: string | null
+  /** Paths relativos das 2 fotos (início/fim do movimento) — resolver com exerciseImageUrl(). */
+  images?: string[] | null
+  equipment?: string | null
+  level?: 'iniciante' | 'intermediário' | 'avançado' | null
+  mechanics?: 'composto' | 'isolado' | null
+  force?: 'empurrar' | 'puxar' | 'estático' | null
+  category?: string | null
+  instructions?: string[]
+  secondary_muscle_ids?: number[]
+  goals?: string[]
 }
 
 export interface Routine {
@@ -88,6 +101,10 @@ export interface Food {
   kcal: number
   is_custom: boolean
   owner_id: string | null
+  // Metadados do catálogo V2 (TACO) — opcionais para customs/registros pré-V2.
+  category?: string | null
+  source?: 'taco' | 'tbca' | 'seed-v1' | 'custom' | null
+  household_measure?: string | null
 }
 
 export interface Meal {
@@ -124,6 +141,30 @@ export interface NutritionGoals {
   carbs_g: number | null
   fat_g: number | null
   kcal: number | null
+}
+
+// V2 Fase E: receitas sugeridas (schema pronto; conteúdo/CRUD entram na V2.1).
+export type RecipeMealKind = 'cafe' | 'almoco' | 'jantar' | 'lanche' | 'pre_treino' | 'pos_treino'
+
+export interface Recipe {
+  id: string
+  name: string
+  meal_kind: RecipeMealKind
+  description: string | null
+  image_url: string | null
+  servings: number
+  prep_minutes: number | null
+  source: string | null
+  is_custom: boolean
+  owner_id: string | null
+  created_at: string
+}
+
+export interface RecipeItem {
+  id: string
+  recipe_id: string
+  food_id: string
+  quantity: number
 }
 
 export interface PushSubscriptionRecord {

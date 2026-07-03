@@ -78,6 +78,11 @@ export async function updateMealItemQuantity(item: MealItem, quantity: number): 
   await mutate('meal_items', 'update', { ...item, quantity })
 }
 
+/** Troca o alimento do item preservando as calorias (quantidade equivalente pré-calculada). */
+export async function swapMealItemFood(item: MealItem, newFoodId: string, newQuantity: number): Promise<void> {
+  await mutate('meal_items', 'update', { ...item, food_id: newFoodId, quantity: newQuantity })
+}
+
 export async function removeMealItem(item: MealItem): Promise<void> {
   await mutate('meal_items', 'delete', item)
 }

@@ -5,21 +5,22 @@ import type { Exercise } from '@/types/domain'
 interface ExercisePickerSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSelect: (exercise: Exercise) => void
+  /** Recebe todos os exercícios selecionados de uma vez (seleção múltipla V2). */
+  onAdd: (exercises: Exercise[]) => void
 }
 
-/** Reaproveita o catálogo em modo seleção — usado pelo builder para adicionar exercícios a uma divisão. */
-export function ExercisePickerSheet({ open, onOpenChange, onSelect }: ExercisePickerSheetProps) {
+/** Catálogo em modo seleção múltipla — o builder adiciona vários exercícios de uma vez. */
+export function ExercisePickerSheet({ open, onOpenChange, onAdd }: ExercisePickerSheetProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="max-h-[90svh] overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Adicionar exercício</SheetTitle>
+          <SheetTitle>Adicionar exercícios</SheetTitle>
         </SheetHeader>
         <CatalogPage
           embedded
-          onSelect={(exercise) => {
-            onSelect(exercise)
+          onAddMany={(exercises) => {
+            onAdd(exercises)
             onOpenChange(false)
           }}
         />

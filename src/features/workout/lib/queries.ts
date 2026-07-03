@@ -36,6 +36,19 @@ export function useExerciseMap() {
   return useMemo(() => new Map((list ?? []).map((e) => [e.id, e])), [list])
 }
 
+/** Contagem de exercícios por grupo muscular — badge das linhas do catálogo. */
+export function useExerciseCounts() {
+  return useLiveQuery(
+    async () => {
+      const counts = new Map<number, number>()
+      await db.exercises.each((e) => counts.set(e.muscle_group_id, (counts.get(e.muscle_group_id) ?? 0) + 1))
+      return counts
+    },
+    [],
+    new Map<number, number>(),
+  )
+}
+
 export function useRoutines(userId: string | undefined) {
   return useLiveQuery(
     async () => {

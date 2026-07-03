@@ -14,6 +14,8 @@ import type {
   MealLog,
   NutritionGoals,
   NotificationSchedule,
+  Recipe,
+  RecipeItem,
 } from '@/types/domain'
 import type { OutboxEntry } from './schema'
 
@@ -37,6 +39,8 @@ export class TreineiDB extends Dexie {
   meal_logs!: EntityTable<MealLog, 'id'>
   nutrition_goals!: EntityTable<NutritionGoals, 'user_id'>
   notification_schedules!: EntityTable<NotificationSchedule, 'id'>
+  recipes!: EntityTable<Recipe, 'id'>
+  recipe_items!: EntityTable<RecipeItem, 'id'>
   outbox!: EntityTable<OutboxEntry, 'id'>
 
   constructor() {
@@ -57,6 +61,17 @@ export class TreineiDB extends Dexie {
       nutrition_goals: 'user_id',
       notification_schedules: 'id, user_id, kind, enabled',
       outbox: '++id, table, created_at',
+    })
+    // V2: índices para filtros do catálogo expandido (873 exercícios / 613 alimentos).
+    this.version(2).stores({
+      exercises: 'id, muscle_group_id, is_custom, owner_id, name, equipment, level, category',
+      foods: 'id, name, is_custom, owner_id, category',
+    })
+    // V2 Fase E: receitas (schema preparado; conteúdo/sync entram na V2.1 —
+    // por isso ainda não estão em SYNCED_TABLES).
+    this.version(3).stores({
+      recipes: 'id, meal_kind, is_custom, owner_id',
+      recipe_items: 'id, recipe_id, food_id',
     })
   }
 }
