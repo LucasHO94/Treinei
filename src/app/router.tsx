@@ -34,6 +34,7 @@ const ProfilePage = lazy(() =>
 const ResetPasswordPage = lazy(() =>
   import('@/features/auth/reset-password-page').then((m) => ({ default: m.ResetPasswordPage })),
 )
+const AdminPage = lazy(() => import('@/features/admin/admin-page').then((m) => ({ default: m.AdminPage })))
 
 export function AppRouter() {
   return (
@@ -51,6 +52,7 @@ export function AppRouter() {
         <Route path="dieta" element={<DietPage />} />
         <Route path="dieta/refeicao/:mealId" element={<MealDetailPage />} />
         <Route path="perfil" element={<ProfilePage />} />
+        <Route path="admin" element={<AdminPage />} />
       </Route>
     </Routes>
   )

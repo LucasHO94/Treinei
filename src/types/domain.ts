@@ -177,6 +177,24 @@ export interface UserProfile {
   avatar_path: string | null
   height_cm: number | null
   updated_at: string
+  role?: 'user' | 'admin'
+}
+
+// V3.8: painel de gestor — linha consolidada retornada por admin_list_users().
+export interface AdminUserRow {
+  user_id: string
+  email: string | null
+  created_at: string
+  last_sign_in_at: string | null
+  banned_until: string | null
+  full_name: string | null
+  avatar_path: string | null
+  role: 'user' | 'admin'
+  routines_count: number
+  workout_sessions_count: number
+  meals_count: number
+  meal_logs_count: number
+  last_activity: string | null
 }
 
 export interface BodyMetric {

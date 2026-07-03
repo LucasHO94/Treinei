@@ -11,8 +11,10 @@ import { WorkoutReminderCard } from '@/features/notifications/workout-reminder-c
 import { IosInstallCard } from '@/features/notifications/onboarding/ios-install-card'
 import { ProfileHeader } from './profile-header'
 import { AccountCard } from './account-card'
+import { AdminEntryCard } from './admin-entry-card'
 import { BodyMetricsCard } from './body-metrics-card'
 import { BodyPhotosCard } from './body-photos-card'
+import { useUserProfile } from './lib/queries'
 
 const EMPTY_FORM = { protein: '', carbs: '', fat: '', kcal: '' }
 
@@ -20,6 +22,7 @@ export function ProfilePage() {
   const userId = useCurrentUserId()
   const session = useSession()
   const canUpload = Boolean(session)
+  const profile = useUserProfile(userId)
   const goals = useNutritionGoals(userId)
   const [form, setForm] = useState(EMPTY_FORM)
   const [loaded, setLoaded] = useState(false)
@@ -64,6 +67,8 @@ export function ProfilePage() {
       />
 
       <AccountCard />
+
+      {profile?.role === 'admin' && <AdminEntryCard />}
 
       <BodyMetricsCard userId={userId} />
 

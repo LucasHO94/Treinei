@@ -948,7 +948,7 @@ const recipeItems = []
 let warnings = 0
 
 for (const r of RECIPES) {
-  const recipeId = uuidV5(`recipe:${r.name}`, UUID_NAMESPACE)
+  const recipeId = uuidV5(`recipe:${r.meal_kind}:${r.name}`, UUID_NAMESPACE)
   let totalKcal = 0
 
   const items = r.ingredients.map((ing) => {
@@ -956,7 +956,7 @@ for (const r of RECIPES) {
     const quantity = f.portion_grams ? ing.grams / f.portion_grams : 1
     totalKcal += f.kcal * quantity
     return {
-      id: uuidV5(`recipe-item:${r.name}:${ing.name}`, UUID_NAMESPACE),
+      id: uuidV5(`recipe-item:${r.meal_kind}:${r.name}:${ing.name}`, UUID_NAMESPACE),
       recipe_id: recipeId,
       food_id: f.id,
       quantity: Math.round(quantity * 100) / 100,
