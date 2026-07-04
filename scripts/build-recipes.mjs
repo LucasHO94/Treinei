@@ -27,6 +27,8 @@ function uuidV5(name, namespace) {
 
 const foodsData = JSON.parse(readFileSync(path.join(ROOT, 'public/data/foods.json'), 'utf8'))
 const foodByName = new Map(foodsData.foods.map((f) => [f.name, f]))
+const { CRONOGRAMA_RECIPES } = await import('./cronograma-data.mjs')
+const { EXPANSION_RECIPES } = await import('./catalog-expansion-data.mjs')
 
 function food(name) {
   const f = foodByName.get(name)
@@ -947,7 +949,17 @@ const recipes = []
 const recipeItems = []
 let warnings = 0
 
-for (const r of RECIPES) {
+// Curadoria base (treinei) + refeições do Cronograma de Alta Performance (planilha do
+// usuário) + expansão geral de variedade (V3.10). As do cronograma carregam source
+// próprio e a tag "Alta Performance" para ficarem identificáveis, mas todas entram nas
+// mesmas sugestões (seção Receitas).
+const ALL_RECIPES = [
+  ...RECIPES.map((r) => ({ ...r, source: 'treinei-curadoria' })),
+  ...CRONOGRAMA_RECIPES.map((r) => ({ ...r, source: 'cronograma-alta-performance', cronograma: true })),
+  ...EXPANSION_RECIPES.map((r) => ({ ...r, source: 'treinei-expansao' })),
+]
+
+for (const r of ALL_RECIPES) {
   const recipeId = uuidV5(`recipe:${r.meal_kind}:${r.name}`, UUID_NAMESPACE)
   let totalKcal = 0
 
@@ -963,10 +975,13 @@ for (const r of RECIPES) {
     }
   })
 
-  const [min, max] = KCAL_RANGE[r.meal_kind]
-  if (totalKcal < min || totalKcal > max) {
-    console.warn(`aviso: "${r.name}" (${r.meal_kind}) = ${Math.round(totalKcal)} kcal, fora da faixa [${min}-${max}]`)
-    warnings++
+  // Receitas do cronograma vêm de um plano real do usuário — não checamos faixa de kcal.
+  if (!r.cronograma) {
+    const [min, max] = KCAL_RANGE[r.meal_kind]
+    if (totalKcal < min || totalKcal > max) {
+      console.warn(`aviso: "${r.name}" (${r.meal_kind}) = ${Math.round(totalKcal)} kcal, fora da faixa [${min}-${max}]`)
+      warnings++
+    }
   }
 
   recipes.push({
@@ -977,7 +992,7 @@ for (const r of RECIPES) {
     image_url: null,
     servings: 1,
     prep_minutes: r.prep_minutes,
-    source: 'treinei-curadoria',
+    source: r.source,
     is_custom: false,
     owner_id: null,
     created_at: '2026-07-03T00:00:00.000Z',
@@ -992,7 +1007,7 @@ for (const r of recipes) byKind[r.meal_kind] = (byKind[r.meal_kind] ?? 0) + 1
 
 writeFileSync(
   path.join(ROOT, 'public/data/recipes.json'),
-  JSON.stringify({ version: 1, generatedAt: new Date().toISOString(), recipes, recipeItems }),
+  JSON.stringify({ version: 3, generatedAt: new Date().toISOString(), recipes, recipeItems }),
 )
 
 console.log(`${recipes.length} receitas geradas (${warnings} avisos de faixa de kcal)`)

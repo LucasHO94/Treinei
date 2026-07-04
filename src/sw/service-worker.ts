@@ -10,18 +10,20 @@ declare let self: ServiceWorkerGlobalScope
 precacheAndRoute(self.__WB_MANIFEST)
 cleanupOutdatedCaches()
 
-// GIFs/ilustrações de exercícios: cache-first, 30 dias — uso offline no treino (RF20).
+// Fotos de execução dos exercícios (jsDelivr — ver src/lib/catalog/media.ts): cache-first,
+// 30 dias — uso offline no treino (RF20). 873 exercícios × 2 fotos: maxEntries generoso
+// pra caber o catálogo inteiro sem expirar entradas em uso.
 registerRoute(
-  ({ request, url }) => request.destination === 'image' && url.pathname.includes('/exercise-media/'),
+  ({ request, url }) => request.destination === 'image' && url.hostname === 'cdn.jsdelivr.net',
   new CacheFirst({
     cacheName: 'exercise-media',
-    plugins: [new ExpirationPlugin({ maxEntries: 200, maxAgeSeconds: 30 * 24 * 60 * 60 })],
+    plugins: [new ExpirationPlugin({ maxEntries: 2000, maxAgeSeconds: 30 * 24 * 60 * 60 })],
   }),
 )
 
 // Avatares e demais imagens remotas: stale-while-revalidate.
 registerRoute(
-  ({ request }) => request.destination === 'image',
+  ({ request, url }) => request.destination === 'image' && url.hostname !== 'cdn.jsdelivr.net',
   new StaleWhileRevalidate({ cacheName: 'images' }),
 )
 

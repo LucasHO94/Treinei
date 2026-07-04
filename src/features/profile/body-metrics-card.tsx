@@ -43,7 +43,7 @@ export function BodyMetricsCard({ userId }: { userId: string }) {
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div className="grid grid-cols-[1fr_1fr_auto] items-end gap-2">
-          <label className="flex flex-col gap-1.5">
+          <label className="flex min-w-0 flex-col gap-1.5">
             <span className="text-xs font-medium text-muted">Peso (kg)</span>
             <Input
               type="number"
@@ -51,11 +51,18 @@ export function BodyMetricsCard({ userId }: { userId: string }) {
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
               placeholder="80,5"
+              className="w-full min-w-0"
             />
           </label>
-          <label className="flex flex-col gap-1.5">
+          <label className="flex min-w-0 flex-col gap-1.5">
             <span className="text-xs font-medium text-muted">Data</span>
-            <Input type="date" value={date} max={todayDate()} onChange={(e) => setDate(e.target.value)} />
+            <Input
+              type="date"
+              value={date}
+              max={todayDate()}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full min-w-0"
+            />
           </label>
           <Button size="default" variant="accent" onClick={handleAdd} disabled={saving || weight === ''}>
             {saving ? '...' : 'Registrar'}

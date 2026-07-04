@@ -8,7 +8,7 @@ import type { MuscleGroup, Exercise, Food, Recipe, RecipeItem } from '@/types/do
  * Incrementar lá e aqui quando o dataset mudar — a hidratação re-executa apenas nessa
  * transição.
  */
-const CATALOG_VERSION = 3
+const CATALOG_VERSION = 5
 const VERSION_KEY = 'treinei-catalog-version'
 
 interface ExercisesFile {

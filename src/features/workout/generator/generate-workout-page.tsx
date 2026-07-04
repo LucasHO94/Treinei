@@ -11,8 +11,10 @@ import {
   GOAL_OPTIONS,
   REGION_OPTIONS,
   EQUIPMENT_MODE_OPTIONS,
+  DURATION_OPTIONS,
   generateWorkoutPlan,
   findExerciseSubstitutes,
+  estimateDivision,
   type Goal,
   type Level,
   type EquipmentMode,
@@ -36,6 +38,7 @@ export function GenerateWorkoutPage() {
   const [regionKeys, setRegionKeys] = useState<string[]>([])
   const [level, setLevel] = useState<Level>('intermediário')
   const [daysPerWeek, setDaysPerWeek] = useState(3)
+  const [durationMinutes, setDurationMinutes] = useState(60)
   const [equipmentMode, setEquipmentMode] = useState<EquipmentMode>('academia')
 
   const [plan, setPlan] = useState<GeneratedWorkout[]>()
@@ -52,7 +55,7 @@ export function GenerateWorkoutPage() {
   }
 
   function handleGenerate() {
-    const result = generateWorkoutPlan({ goals, regionKeys, level, daysPerWeek, equipmentMode, exercises: allExercises })
+    const result = generateWorkoutPlan({ goals, regionKeys, level, daysPerWeek, durationMinutes, equipmentMode, exercises: allExercises })
     setPlan(result)
   }
 
@@ -136,6 +139,17 @@ export function GenerateWorkoutPage() {
       </section>
 
       <section className="flex flex-col gap-2">
+        <h2 className="text-sm font-semibold text-muted">Tempo por sessão</h2>
+        <div className="flex flex-wrap gap-2">
+          {DURATION_OPTIONS.map((d) => (
+            <Chip key={d.minutes} active={durationMinutes === d.minutes} onClick={() => setDurationMinutes(d.minutes)}>
+              {d.label}
+            </Chip>
+          ))}
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-2">
         <h2 className="text-sm font-semibold text-muted">Equipamento disponível</h2>
         <div className="flex flex-wrap gap-2">
           {EQUIPMENT_MODE_OPTIONS.map((e) => (
@@ -159,9 +173,16 @@ export function GenerateWorkoutPage() {
       {plan && plan.length > 0 && (
         <div className="flex flex-col gap-3">
           <h2 className="text-base font-bold">Prévia da rotina</h2>
-          {plan.map((division, divisionIndex) => (
+          {plan.map((division, divisionIndex) => {
+            const estimate = estimateDivision(division)
+            return (
             <div key={division.name} className="rounded-lg border border-border bg-card p-4">
-              <p className="mb-2 font-semibold">{division.name}</p>
+              <div className="mb-2 flex items-baseline justify-between gap-2">
+                <p className="font-semibold">{division.name}</p>
+                <p className="shrink-0 text-xs text-muted">
+                  ~{estimate.minutes} min · {estimate.exerciseCount} exercícios · {estimate.totalSets} séries
+                </p>
+              </div>
               <div className="flex flex-col gap-2">
                 {division.exercises.map((item, exerciseIndex) => (
                   <div key={item.exercise.id} className="flex items-center justify-between gap-2 rounded-md bg-surface p-2.5">
@@ -183,7 +204,8 @@ export function GenerateWorkoutPage() {
                 ))}
               </div>
             </div>
-          ))}
+            )
+          })}
 
           <Button size="lg" variant="accent" onClick={() => void handleUsePlan()} disabled={saving}>
             {saving ? 'Criando rotina...' : 'Usar este treino'}

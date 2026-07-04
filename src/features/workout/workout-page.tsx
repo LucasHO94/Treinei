@@ -1,17 +1,35 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Plus, Dumbbell, History, Sparkles } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Plus, Dumbbell, History, Sparkles, Flame } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useCurrentUserId } from '@/lib/auth/current-user'
-import { useRoutines } from './lib/queries'
+import { useRoutines, useExerciseMap } from './lib/queries'
+import { buildCuratedAbcdPlan, CURATED_ABCD_NAME } from './generator/engine'
+import { createGeneratedRoutine } from './lib/actions'
 import { RoutineCard } from './builder/routine-card'
 import { CreateRoutineDialog } from './builder/create-routine-dialog'
 
 export function WorkoutPage() {
   const userId = useCurrentUserId()
   const routines = useRoutines(userId)
+  const exerciseMap = useExerciseMap()
+  const navigate = useNavigate()
   const [createOpen, setCreateOpen] = useState(false)
+  const [building, setBuilding] = useState(false)
+
+  async function handleBuildAbcd() {
+    const exercises = [...exerciseMap.values()]
+    if (exercises.length === 0 || building) return
+    setBuilding(true)
+    try {
+      const plan = buildCuratedAbcdPlan(exercises)
+      const routine = await createGeneratedRoutine(userId, CURATED_ABCD_NAME, plan)
+      navigate(`/treino/rotina/${routine.id}`)
+    } finally {
+      setBuilding(false)
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4 p-4">
@@ -47,6 +65,26 @@ export function WorkoutPage() {
           <p className="text-xs text-muted">Monte uma rotina pronta de acordo com seu objetivo</p>
         </div>
       </Link>
+
+      {/* Programa curado (planilha do usuário), separado dos treinos sugeridos por objetivo. */}
+      <button
+        type="button"
+        onClick={() => void handleBuildAbcd()}
+        disabled={building || exerciseMap.size === 0}
+        className="flex items-center gap-3 rounded-lg border border-primary/40 bg-primary/10 p-4 text-left transition-colors hover:bg-primary/15 disabled:opacity-60"
+      >
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
+          <Flame className="size-5" />
+        </span>
+        <div className="min-w-0">
+          <p className="font-semibold">{CURATED_ABCD_NAME}</p>
+          <p className="text-xs text-muted">
+            {building
+              ? 'Montando programa ABCD...'
+              : 'Divisão A · B · C · D de alta performance e hipertrofia'}
+          </p>
+        </div>
+      </button>
 
       {routines != null && routines.length === 0 && (
         <Card>

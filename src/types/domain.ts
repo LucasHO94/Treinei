@@ -103,7 +103,7 @@ export interface Food {
   owner_id: string | null
   // Metadados do catálogo V2 (TACO) — opcionais para customs/registros pré-V2.
   category?: string | null
-  source?: 'taco' | 'tbca' | 'seed-v1' | 'custom' | null
+  source?: 'taco' | 'tbca' | 'seed-v1' | 'custom' | 'cronograma' | 'expansion' | null
   household_measure?: string | null
 }
 

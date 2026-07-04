@@ -110,6 +110,8 @@ const TACO_DEDUP = new Set([
 ])
 
 const legacyFoods = JSON.parse(readFileSync(path.join(__dirname, 'legacy-foods.json'), 'utf8'))
+const { EXTRA_FOODS } = await import('./cronograma-data.mjs')
+const { EXPANSION_FOODS } = await import('./catalog-expansion-data.mjs')
 
 async function main() {
   let taco
@@ -162,8 +164,56 @@ async function main() {
     })
   }
 
+  // 3. Extras do Cronograma de Alta Performance (alimentos da planilha do usuário que a
+  // TACO não cobria). UUID determinístico + source 'cronograma' → bulkPut idempotente.
+  const existingNames = new Set(foods.map((f) => f.name))
+  let extras = 0
+  for (const extra of EXTRA_FOODS) {
+    if (existingNames.has(extra.name)) continue
+    foods.push({
+      id: uuidV5(`food:cronograma:${extra.name}`, UUID_NAMESPACE),
+      name: extra.name,
+      portion_desc: '100g',
+      portion_grams: 100,
+      protein_g: num(extra.protein_g),
+      carbs_g: num(extra.carbs_g),
+      fat_g: num(extra.fat_g),
+      kcal: num(extra.kcal),
+      is_custom: false,
+      owner_id: null,
+      category: extra.category ?? 'Outros',
+      source: 'cronograma',
+      household_measure: null,
+    })
+    extras++
+  }
+
+  // 4. Expansão geral do catálogo (V3.10): mais variedade de alimentos comuns não
+  // cobertos pela TACO (industrializados/importados). UUID determinístico + source
+  // 'expansion' → bulkPut idempotente.
+  let expansions = 0
+  for (const extra of EXPANSION_FOODS) {
+    if (existingNames.has(extra.name)) continue
+    foods.push({
+      id: uuidV5(`food:expansion:${extra.name}`, UUID_NAMESPACE),
+      name: extra.name,
+      portion_desc: '100g',
+      portion_grams: 100,
+      protein_g: num(extra.protein_g),
+      carbs_g: num(extra.carbs_g),
+      fat_g: num(extra.fat_g),
+      kcal: num(extra.kcal),
+      is_custom: false,
+      owner_id: null,
+      category: extra.category ?? 'Outros',
+      source: 'expansion',
+      household_measure: null,
+    })
+    expansions++
+  }
+
   const out = {
-    version: 2,
+    version: 4,
     generatedAt: new Date().toISOString(),
     foods,
   }
@@ -173,7 +223,9 @@ async function main() {
   writeFileSync(outPath, JSON.stringify(out))
   const kb = Math.round(Buffer.byteLength(JSON.stringify(out)) / 1024)
   console.log(`✔ ${outPath}`)
-  console.log(`  ${foods.length} alimentos (${legacyFoods.length} legados, ${deduped} duplicatas TACO puladas), ${kb} KB`)
+  console.log(
+    `  ${foods.length} alimentos (${legacyFoods.length} legados, ${deduped} duplicatas TACO puladas, ${extras} extras do cronograma, ${expansions} extras de expansão), ${kb} KB`,
+  )
 
   const ids = new Set(foods.map((f) => f.id))
   if (ids.size !== foods.length) throw new Error('IDs duplicados!')

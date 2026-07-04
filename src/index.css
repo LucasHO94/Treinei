@@ -41,11 +41,18 @@
 @layer base {
   html {
     color-scheme: dark;
+    /* Rede de segurança: nenhum filho (ex.: input[type=date] com largura intrínseca
+       grande no iOS Safari) deve conseguir estourar a largura do documento e gerar
+       scroll horizontal / recalcular o layout das outras telas ao navegar. */
+    overflow-x: hidden;
+    width: 100%;
   }
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
     margin: 0;
+    overflow-x: hidden;
+    width: 100%;
   }
 
   h1, h2, h3, h4 {

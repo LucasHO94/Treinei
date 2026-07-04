@@ -288,7 +288,7 @@ function ExerciseGrid({
             style={{ contentVisibility: 'auto', containIntrinsicSize: '160px 176px' }}
           >
             <button type="button" onClick={() => onTap(exercise)} className="block w-full text-left">
-              <ExerciseMedia exercise={exercise} className="aspect-square w-full" />
+              <ExerciseMedia exercise={exercise} animate={false} className="aspect-square w-full" />
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent px-2 pb-1.5 pt-6">
                 <p className="line-clamp-2 text-xs font-medium leading-tight text-white">{exercise.name}</p>
               </div>
